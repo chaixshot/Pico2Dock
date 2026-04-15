@@ -33,7 +33,7 @@
 
             <ui:DynamicScrollViewer
                 Grid.Row="1"
-                Margin="10,20,0,20"
+                Margin="10,20,10,20"
                 Padding="15,0,15,0"
                 CanContentScroll="True"
                 IsScrollingVertically="True">
@@ -118,7 +118,8 @@
                                 DragLeave="DropBox_DragLeave"
                                 DragOver="DropBox_DragOver"
                                 Drop="DropBox_Drop"
-                                ItemsSource="{Binding Path=Files}" />
+                                ItemsSource="{Binding Path=Files}"
+                                KeyUp="DropBox_KeyUp" />
                             <ui:Button
                                 x:Name="DropBoxButton"
                                 Width="{Binding ActualWidth, ElementName=DropBox, Mode=OneWay}"
@@ -131,11 +132,13 @@
                                 BorderBrush="{x:Null}"
                                 Click="DropBox_Click"
                                 Content="Drag and drop APK file here, or click here to choose a file"
+                                Cursor="Hand"
                                 DragLeave="DropBox_DragLeave"
                                 DragOver="DropBox_DragOver"
                                 Drop="DropBox_Drop"
                                 FontWeight="Bold"
-                                Opacity="0.4" />
+                                Opacity="0.4"
+                                ToolTip="Click or drop file here" />
                         </Grid>
                     </ui:Card>
 
@@ -146,20 +149,30 @@
                         <ui:Button
                             x:Name="StartButton"
                             Click="StartProcess"
-                            Content="Start" />
+                            Content="Start"
+                            ToolTip="Start contert process" />
 
                         <ui:Button
                             x:Name="CancleButton"
-                            Margin="10,0,0,0"
+                            Margin="5,0,0,0"
                             Click="CancleProcess"
                             Content="Cancle"
-                            IsEnabled="False" />
+                            IsEnabled="False"
+                            ToolTip="Terminate processing task" />
 
                         <ui:Button
                             x:Name="ClearButton"
-                            Margin="10,0,0,0"
+                            Margin="5,0,0,0"
                             Click="ClearFiles"
-                            Content="Clear" />
+                            Content="Clear"
+                            ToolTip="Clear all files" />
+
+                        <ui:Button
+                            x:Name="DeleteButton"
+                            Margin="5,0,0,0"
+                            Click="DeleteFiles"
+                            Content="Delete"
+                            ToolTip="Delete current select file" />
                     </StackPanel>
 
                     <StackPanel Grid.Row="3" Margin="0,30,0,0">
@@ -178,6 +191,7 @@
                                 HorizontalAlignment="Center"
                                 Foreground="White" />
                         </Grid>
+
                         <ui:TextBox
                             x:Name="StatusText"
                             Height="100"
@@ -187,6 +201,13 @@
                             Text="test"
                             TextWrapping="Wrap"
                             VerticalScrollBarVisibility="Visible" />
+
+                        <ui:Button
+                            x:Name="OutputButton"
+                            Margin="0,3,0,0"
+                            Click="OpenOutput"
+                            Content="Open patched folder"
+                            ToolTip="Open output folder in file explorer" />
                     </StackPanel>
                 </Grid>
             </ui:DynamicScrollViewer>

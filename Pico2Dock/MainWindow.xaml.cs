@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Linq;
 using Wpf.Ui.Appearance;
@@ -26,6 +28,7 @@ namespace Pico2Dock
             VersionText.Text = $"Version {GetAppVersion()}";
 
             ResetAppearance();
+            ControlButton(1);
         }
 
         #region Parameter
@@ -103,12 +106,20 @@ namespace Pico2Dock
             DropBox_UpdateText();
         }
 
+        private void DropBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+                _files.RemoveAt(DropBox.SelectedIndex);
+        }
+
         private void DropBox_UpdateText()
         {
             if (_files.Count > 0)
                 DropBoxButton.Visibility = Visibility.Hidden;
             else
                 DropBoxButton.Visibility = Visibility.Visible;
+
+            ControlButton(1);
         }
         #endregion
 
@@ -139,6 +150,17 @@ namespace Pico2Dock
             ResetAppearance();
             DropBox_UpdateText();
         }
+
+        private void DeleteFiles(object sender, RoutedEventArgs e)
+        {
+            if (DropBox.SelectedIndex > -1)
+                _files.RemoveAt(DropBox.SelectedIndex);
+        }
+
+        private void OpenOutput(object sender, RoutedEventArgs e)
+        {
+            OpenExplorer("patched");
+        }
         #endregion
 
         private void IncressProgressBar(double count)
@@ -149,7 +171,7 @@ namespace Pico2Dock
 
         private async void MainTask()
         {
-            ControlButton(false);
+            ControlButton(2);
 
             int ordinal = 0;
             string errorMessage = "";
@@ -303,24 +325,29 @@ namespace Pico2Dock
             SoundPlayer simpleSound;
             if (IsCancleProcess)
             {
+                ControlButton(1);
+
                 StatusText.Text = "Process has been terminated.";
                 simpleSound = new(@"c:\Windows\Media\Windows Hardware Remove.wav");
             }
             else if (!string.IsNullOrEmpty(errorMessage))
             {
+                ControlButton(1);
+
                 StatusText.Text = errorMessage;
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
                 simpleSound = new(@"c:\Windows\Media\Windows Error.wav");
             }
             else
             {
+                ControlButton(3);
+
                 StatusText.Text = $"Current Status: All APK files have been modified.\nYou can install them using the APK files in the patched folder.";
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\notify.wav");
             }
 
             IncressProgressBar(_files.Count);
-            ControlButton(true);
             DirectoryCleanup();
 
             // Play sound
@@ -328,20 +355,28 @@ namespace Pico2Dock
         }
 
         #region Utils
-        private void ControlButton(bool state)
+        private void ControlButton(int state)
         {
-            if (state)
+            if (state == 1)
             {
                 StartButton.IsEnabled = true;
                 CancleButton.IsEnabled = false;
-                ClearButton.IsEnabled = true;
             }
-            else
+            if (state == 2)
             {
                 StartButton.IsEnabled = false;
                 CancleButton.IsEnabled = true;
-                ClearButton.IsEnabled = false;
             }
+            if (state == 3)
+            {
+                StartButton.IsEnabled = false;
+                CancleButton.IsEnabled = false;
+            }
+
+            if (_files.Count > 0)
+                ClearButton.IsEnabled = true;
+            else
+                ClearButton.IsEnabled = false;
         }
 
         private void DirectoryCleanup()
@@ -390,6 +425,17 @@ namespace Pico2Dock
         private static string GetAppVersion()
         {
             return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown error reading assembly version";
+        }
+
+        private static void OpenExplorer(string filePath)
+        {
+            string args = string.Format("/e, /select, \"{0}\"", filePath);
+            ProcessStartInfo info = new()
+            {
+                FileName = "explorer",
+                Arguments = args
+            };
+            Process.Start(info);
         }
         #endregion
     }
