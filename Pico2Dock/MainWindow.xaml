@@ -119,7 +119,8 @@
                                 DragOver="DropBox_DragOver"
                                 Drop="DropBox_Drop"
                                 ItemsSource="{Binding Path=Files}"
-                                KeyUp="DropBox_KeyUp" />
+                                KeyUp="DropBox_KeyUp"
+                                MouseDoubleClick="DropBox_MouseDoubleClick" />
                             <ui:Button
                                 x:Name="DropBoxButton"
                                 Width="{Binding ActualWidth, ElementName=DropBox, Mode=OneWay}"

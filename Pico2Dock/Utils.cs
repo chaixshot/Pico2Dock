@@ -11,7 +11,11 @@ namespace Pico2Dock
 
         public static void OpenExplorer(string filePath)
         {
-            string args = string.Format("/e, \"{0}\"", filePath);
+            string args;
+            if (System.IO.Path.GetExtension(filePath) != string.Empty)
+                args = string.Format("/e ,/select, \"{0}\"", filePath);
+            else
+                args = string.Format("/e, \"{0}\"", filePath);
             ProcessStartInfo info = new()
             {
                 FileName = "explorer",

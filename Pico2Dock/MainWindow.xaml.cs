@@ -116,6 +116,13 @@ namespace Pico2Dock
                 _files.RemoveAt(DropBox.SelectedIndex);
         }
 
+        private void DropBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (DropBox.SelectedIndex > -1)
+                Utils.OpenExplorer(DropBox.SelectedValue.ToString());
+
+        }
+
         private void DropBox_UpdateText()
         {
             if (_files.Count > 0)
