@@ -7,13 +7,13 @@
 ### Convert the APK file for Pico 4 VR to change the application state from Floating Far app to Dashboard Near Dock, similar to File Manager.<br>Allow multitasking while in a full-screen immersive app.
 </div>
 
-## Desktop screenshot
+## 🖥️ Desktop screenshot
 <image src="Resource/Desktop_Pico2Dock.png" width="400">
   
-## VR Headset screenshot
+## 👓 VR Headset screenshot
 <image src="Resource/Screenshot_pl.solidexplorer2.jpeg" width="400"> <image src="Resource/Screenshot_org.mozilla.firefox_beta.jpeg" width="400"> <image src="Resource/Screenshot_com.google.android.apps.translate.jpeg" width="400"> <image src="Resource/Screenshot_app.android.apps.youtube.music.jpeg" width="400">
 
-## Prerequisites
+## ⛏️ Prerequisites
 
 <div align="center">
 
@@ -24,13 +24,13 @@
 
 </div>
 
-You have to install **.NET runtime 10.0** or higher. And installed **Java 17** as recommended.
+You have to install **.NET runtime 10.0** or higher, and **Java 17** as recommended.
 
-Pico 4 supports APK Architecture arm64-v8a, armeabi-v7a, and armeabi.
+[Pico 4](https://www.picoxr.com/products/pico4) supports APK Architecture **arm64-v8a**, **armeabi-v7a**, and **armeabi**.
 
 
-## Getting Started 
-1. Read and finish the [Prerequisites](#prerequisites)
+## 📐 How to use? 
+1. Read and finish the [Prerequisites](#%EF%B8%8F-prerequisites)
 2. Download the latest [Release](https://github.com/chaixshot/Pico2Dock/releases) from the GitHub repo
 3. Run **Pico2Dock.exe**
 4. Drag & Drop APK files to the drop space
@@ -38,7 +38,8 @@ Pico 4 supports APK Architecture arm64-v8a, armeabi-v7a, and armeabi.
 6. Dock APK files are in the patched folder, or open by pressing **Open patched folder**
 7. Copy APK files to the headset and install or install via ``adb install`` command
 
-## Special thanks to:
-- [apktool](https://github.com/iBotPeaches/Apktool) Used for decompiling and recompiling Android Package
-- [uber-apk-signer](https://github.com/patrickfav/uber-apk-signer) Used for signing
-- [WPF-UI](https://github.com/lepoco/wpfui)
+## 🙏 Special thanks to:
+- [apktool](https://github.com/iBotPeaches/Apktool) - Used for decompiling and recompiling Android Package
+- [uber-apk-signer](https://github.com/patrickfav/uber-apk-signer) - Used for signing
+- [WPF-UI](https://github.com/lepoco/wpfui) - Fluent UI theme
+- [MarkdView](https://github.com/hopesy/MarkdView) - Content textbox Markdown Syntax
