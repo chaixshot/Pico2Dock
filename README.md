@@ -13,7 +13,6 @@
 ## VR Headset screenshot
 <image src="Resource/Screenshot_pl.solidexplorer2.jpeg" width="400"> <image src="Resource/Screenshot_org.mozilla.firefox_beta.jpeg" width="400"> <image src="Resource/Screenshot_com.google.android.apps.translate.jpeg" width="400"> <image src="Resource/Screenshot_app.android.apps.youtube.music.jpeg" width="400">
 
-
 ## Prerequisites
 
 <div align="center">
@@ -25,9 +24,19 @@
 
 </div>
 
-You have to installed **.NET runtime 10.0** or higher. And installed **Java 17** as recommended.
+You have to install **.NET runtime 10.0** or higher. And installed **Java 17** as recommended.
 
 Pico 4 supports APK Architecture arm64-v8a, armeabi-v7a, and armeabi.
+
+
+## Getting Started 
+1. Read and finish the [Prerequisites](#prerequisites)
+2. Download the latest [Release](https://github.com/chaixshot/Pico2Dock/releases) from the GitHub repo
+3. Run **Pico2Dock.exe**
+4. Drag & Drop APK files to the drop space
+5. Press the **Start** button and wait for the finish
+6. Dock APK files are in the patched folder, or open by pressing **Open patched folder**
+7. Copy APK files to the headset and install or install via ``adb install`` command
 
 ## Special thanks to:
 - [apktool](https://github.com/iBotPeaches/Apktool) Used for decompiling and recompiling Android Package
