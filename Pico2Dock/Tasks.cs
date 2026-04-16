@@ -4,9 +4,9 @@ namespace Pico2Dock
 {
     internal class Tasks
     {
-        public static Process decompiler;
-        public static Process compiler;
-        public static Process signer;
+        public static Process? decompiler;
+        public static Process? compiler;
+        public static Process? signer;
 
         public static string DecompilerTask(string filePath)
         {
@@ -24,7 +24,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.1.jar\" d \"{filePath}\" -q -o ./worker",
+                    Arguments = $"-jar \"src/apktool_3.0.1.jar\" decode \"{filePath}\" -q -o ./worker",
                 }
             };
 
@@ -35,12 +35,12 @@ namespace Pico2Dock
             }
             catch (Exception)
             {
-                return $"ERROR: Unable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
+                return $"ERROR:\nUnable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
             }
 
 
             if (decompiler.ExitCode != 0)
-                return $"ERROR: file {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
+                return $"ERROR:\nfile {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
             else
                 return string.Empty;
         }
@@ -59,7 +59,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.1.jar\" b \"./worker\" -q -o \"./singer/{apkName}\"",
+                    Arguments = $"-jar \"src/apktool_3.0.1.jar\" build \"./worker\" -q -o \"./singer/{apkName}\"",
                 }
             };
 
@@ -70,11 +70,11 @@ namespace Pico2Dock
             }
             catch (Exception)
             {
-                return $"ERROR: Unable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
+                return $"ERROR:\nUnable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
             }
 
             if (decompiler.ExitCode != 0)
-                return $"ERROR: file {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
+                return $"ERROR:\nfile {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
             else
                 return string.Empty;
         }
@@ -104,11 +104,11 @@ namespace Pico2Dock
             }
             catch (Exception)
             {
-                return $"ERROR: Unable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
+                return $"ERROR:\nUnable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
             }
 
             if (decompiler.ExitCode != 0)
-                return $"ERROR: file {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
+                return $"ERROR:\nfile {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
             else
                 return string.Empty;
         }
