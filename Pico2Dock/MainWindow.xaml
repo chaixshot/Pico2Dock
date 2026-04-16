@@ -8,7 +8,7 @@
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="Pico2Dock"
     MinWidth="500"
-    MinHeight="700"
+    MinHeight="750"
     Background="Transparent"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Mica"
