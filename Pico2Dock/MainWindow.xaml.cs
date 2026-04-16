@@ -29,6 +29,9 @@ namespace Pico2Dock
 
             ResetAppearance();
             ControlButton(1);
+
+            DropBox.SizeChanged += DropBoxChangeDeleteButton;
+            DropBox.SelectionChanged += DropBoxChangeDeleteButton;
         }
 
         #region Parameter
@@ -58,22 +61,25 @@ namespace Pico2Dock
 
         private void DropBox_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            if (StartButton.IsEnabled)
             {
-                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-
-                foreach (string filePath in files)
+                if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
-                    string fileExtension = System.IO.Path.GetExtension(filePath);
-                    if (fileExtension == ".apk")
-                        _files.Add(filePath);
+                    string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+                    foreach (string filePath in files)
+                    {
+                        string fileExtension = System.IO.Path.GetExtension(filePath);
+                        if (fileExtension == ".apk")
+                            _files.Add(filePath);
+                    }
                 }
+
+                Button? button = sender as Button;
+                button?.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+
+                DropBox_UpdateText();
             }
-
-            Button? button = sender as Button;
-            button?.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
-
-            DropBox_UpdateText();
         }
 
         private void DropBox_DragOver(object sender, DragEventArgs e)
@@ -108,7 +114,7 @@ namespace Pico2Dock
 
         private void DropBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.Delete)
+            if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && StartButton.IsEnabled)
                 _files.RemoveAt(DropBox.SelectedIndex);
         }
 
@@ -153,7 +159,7 @@ namespace Pico2Dock
 
         private void DeleteFiles(object sender, RoutedEventArgs e)
         {
-            if (DropBox.SelectedIndex > -1)
+            if (DropBox.SelectedIndex > -1 && StartButton.IsEnabled)
                 _files.RemoveAt(DropBox.SelectedIndex);
         }
 
@@ -173,22 +179,35 @@ namespace Pico2Dock
         {
             ControlButton(2);
 
-            int ordinal = 0;
             string errorMessage = "";
+
+            // Remove file indicator except error
+            foreach (string filePath in _files.ToList())
+            {
+                int index = _files.IndexOf(filePath);
+
+                _files.RemoveAt(index);
+                _files.Insert(index, filePath.Replace("🛠️ ", "").Replace("✔️ ", ""));
+            }
 
             foreach (string filePath in _files.ToList())
             {
                 DirectoryCleanup();
 
+                int index = _files.IndexOf(filePath);
                 string apkName = System.IO.Path.GetFileName(filePath);
 
-                // -------------------- [[ File indicator ]] --------------------
-                _files.RemoveAt(ordinal);
-                _files.Insert(ordinal, filePath + " 🛠️");
-                DropBox.SelectedIndex = ordinal;
+                // skip is file error from previous task
+                if (filePath.Contains("✖️"))
+                    continue;
+
+                //?? -------------------- [[ File indicator ]] --------------------
+                _files.RemoveAt(index);
+                _files.Insert(index, "🛠️ " + filePath);
+                DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
-                // -------------------- [[ Start decompiler apk ]] --------------------
+                //?? -------------------- [[ Start decompiler apk ]] --------------------
                 StatusText.Text = $"Current Status: Decompiling {apkName}...";
                 IncressProgressBar(_files.Count);
 
@@ -206,9 +225,17 @@ namespace Pico2Dock
                     IncressProgressBar(_files.Count);
                 }
                 else
-                    goto skipMainTask;
+                {
+                    _files.RemoveAt(index);
+                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
+                    if (_files.Count > 1)
+                        continue;
 
-                // -------------------- [[ Edit AndroidManifest.xml ]] --------------------
+                    else
+                        goto skipMainTask;
+                }
+
+                //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
                 StatusText.Text = $"Current Status: Modifing AndroidManifest.xml of {apkName}...";
                 IncressProgressBar(_files.Count);
 
@@ -238,7 +265,7 @@ namespace Pico2Dock
                 StatusText.Text = $"Current Status: The file AndroidManifest.xml of {apkName} is modified successfully";
                 IncressProgressBar(_files.Count);
 
-                // -------------------- [[ Start compiler apk ]] --------------------
+                //?? -------------------- [[ Start compiler apk ]] --------------------
                 StatusText.Text = $"Current Status: Compiling {apkName}...";
                 IncressProgressBar(_files.Count);
 
@@ -256,9 +283,17 @@ namespace Pico2Dock
                     IncressProgressBar(_files.Count);
                 }
                 else
-                    goto skipMainTask;
+                {
+                    _files.RemoveAt(index);
+                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
+                    if (_files.Count > 1)
+                        continue;
 
-                // -------------------- [[ Start uber apk signer ]] --------------------
+                    else
+                        goto skipMainTask;
+                }
+
+                //?? -------------------- [[ Start uber apk signer ]] --------------------
                 StatusText.Text = $"Current Status: Signing {apkName}...";
                 IncressProgressBar(_files.Count);
 
@@ -276,9 +311,17 @@ namespace Pico2Dock
                     IncressProgressBar(_files.Count);
                 }
                 else
-                    goto skipMainTask;
+                {
+                    _files.RemoveAt(index);
+                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
+                    if (_files.Count > 1)
+                        continue;
 
-                // -------------------- [[ Rename ]] --------------------
+                    else
+                        goto skipMainTask;
+                }
+
+                //?? -------------------- [[ Rename ]] --------------------
                 IncressProgressBar(_files.Count);
 
                 bool signedFile = File.Exists($"./patched/{apkName[..^4]}-aligned-signed.apk");
@@ -309,44 +352,54 @@ namespace Pico2Dock
                 }
                 else
                 {
-                    errorMessage = $"Current Status: Process {apkName} is failed";
-                    goto skipMainTask;
+                    errorMessage = $"ERROR: Unable to compile file {apkName}";
+
+                    _files.RemoveAt(index);
+                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
+                    if (_files.Count > 1)
+                        continue;
+                    else
+                        goto skipMainTask;
                 }
 
-                // -------------------- [[ File indicator ]] --------------------
+                //?? -------------------- [[ File indicator ]] --------------------
                 IncressProgressBar(_files.Count);
-                _files.RemoveAt(ordinal);
-                _files.Insert(ordinal, filePath + " ✔️");
-
-                ordinal++;
+                _files.RemoveAt(index);
+                _files.Insert(index, "✔️ " + filePath);
             }
 
+            //?? After task
         skipMainTask:
             SoundPlayer simpleSound;
+
+            StatusProgressBar.Value = 100;
+
             if (IsCancleProcess)
-            {
-                ControlButton(1);
+            { // Terminate
+                PercentText.Text = "Terminated";
 
                 StatusText.Text = "Process has been terminated.";
+                StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
                 simpleSound = new(@"c:\Windows\Media\Windows Hardware Remove.wav");
             }
             else if (!string.IsNullOrEmpty(errorMessage))
-            {
-                ControlButton(1);
+            { // Error
+                PercentText.Text = "Error";
 
                 StatusText.Text = errorMessage;
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
                 simpleSound = new(@"c:\Windows\Media\Windows Error.wav");
             }
             else
-            {
-                ControlButton(3);
+            { // Success
+                PercentText.Text = "Successful";
 
-                StatusText.Text = $"Current Status: All APK files have been modified.\nYou can install them using the APK files in the patched folder.";
+                StatusText.Text = $"Current Status:\nAll APK files have been modified.\nYou can install them using the APK files in the patched folder.";
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\notify.wav");
             }
 
+            ControlButton(1);
             IncressProgressBar(_files.Count);
             DirectoryCleanup();
 
@@ -367,13 +420,8 @@ namespace Pico2Dock
                 StartButton.IsEnabled = false;
                 CancleButton.IsEnabled = true;
             }
-            if (state == 3)
-            {
-                StartButton.IsEnabled = false;
-                CancleButton.IsEnabled = false;
-            }
 
-            if (_files.Count > 0)
+            if (_files.Count > 0 && !CancleButton.IsEnabled)
                 ClearButton.IsEnabled = true;
             else
                 ClearButton.IsEnabled = false;
@@ -411,15 +459,6 @@ namespace Pico2Dock
             PercentText.Text = "";
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;
-
-            // Remove file indicator
-            foreach (string item in _files.ToList())
-            {
-                int index = _files.IndexOf(item);
-
-                _files.RemoveAt(index);
-                _files.Insert(index, item.Replace(" 🛠️", "").Replace(" ✔️", ""));
-            }
         }
 
         private static string GetAppVersion()
@@ -436,6 +475,14 @@ namespace Pico2Dock
                 Arguments = args
             };
             Process.Start(info);
+        }
+
+        private void DropBoxChangeDeleteButton(object sender, dynamic e)
+        {
+            if (StartButton.IsEnabled && DropBox.SelectedIndex != -1)
+                DeleteButton.IsEnabled = true;
+            else
+                DeleteButton.IsEnabled = false;
         }
         #endregion
     }
