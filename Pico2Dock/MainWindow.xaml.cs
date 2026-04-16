@@ -136,7 +136,7 @@ namespace Pico2Dock
                 MainTask();
             }
             else
-                StatusText.Text = "ERROR: There is no file in process.";
+                ChangeStateText("ERROR: There is no file in process.");
         }
 
         private void CancleProcess(object sender, RoutedEventArgs e)
@@ -206,7 +206,7 @@ namespace Pico2Dock
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
-                StatusText.Text = $"Current Status: Decompiling {apkName}...";
+                ChangeStateText($"Current Status: Decompiling {apkName}...");
                 IncressProgressBar(_files.Count);
 
                 await Task.Run(() =>
@@ -219,7 +219,7 @@ namespace Pico2Dock
 
                 if (string.IsNullOrEmpty(errorMessage))
                 {
-                    StatusText.Text = $"Current Status: Decompile {apkName} completed";
+                    ChangeStateText($"Current Status: Decompile {apkName} completed");
                     IncressProgressBar(_files.Count);
                 }
                 else
@@ -236,7 +236,7 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
-                StatusText.Text = $"Current Status: Modifing AndroidManifest.xml of {apkName}...";
+                ChangeStateText($"Current Status: Modifing AndroidManifest.xml of {apkName}...");
                 IncressProgressBar(_files.Count);
 
                 XNamespace android = "http://schemas.android.com/apk/res/android";
@@ -262,11 +262,11 @@ namespace Pico2Dock
                 }
                 doc.Save("./worker/AndroidManifest.xml");
 
-                StatusText.Text = $"Current Status: The file AndroidManifest.xml of {apkName} is modified successfully";
+                ChangeStateText($"Current Status: The file AndroidManifest.xml of {apkName} is modified successfully");
                 IncressProgressBar(_files.Count);
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
-                StatusText.Text = $"Current Status: Compiling {apkName}...";
+                ChangeStateText($"Current Status: Compiling {apkName}...");
                 IncressProgressBar(_files.Count);
 
                 await Task.Run(() =>
@@ -279,7 +279,7 @@ namespace Pico2Dock
 
                 if (string.IsNullOrEmpty(errorMessage))
                 {
-                    StatusText.Text = $"Current Status: Compile {apkName} completed";
+                    ChangeStateText($"Current Status: Compile {apkName} completed");
                     IncressProgressBar(_files.Count);
                 }
                 else
@@ -296,7 +296,7 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Start uber apk signer ]] --------------------
-                StatusText.Text = $"Current Status: Signing {apkName}...";
+                ChangeStateText($"Current Status: Signing {apkName}...");
                 IncressProgressBar(_files.Count);
 
                 await Task.Run(() =>
@@ -309,7 +309,7 @@ namespace Pico2Dock
 
                 if (string.IsNullOrEmpty(errorMessage))
                 {
-                    StatusText.Text = $"Current Status: Sign {apkName} completed";
+                    ChangeStateText($"Current Status: Sign {apkName} completed");
                     IncressProgressBar(_files.Count);
                 }
                 else
@@ -352,7 +352,7 @@ namespace Pico2Dock
                         );
                     }
 
-                    StatusText.Text = $"Current Status: Process {apkName} is successful";
+                    ChangeStateText($"Current Status: Process {apkName} is successful");
                 }
                 else
                 {
@@ -385,7 +385,7 @@ namespace Pico2Dock
             { // Terminate
                 PercentText.Text = "Terminated";
 
-                StatusText.Text = "Process has been terminated.";
+                ChangeStateText("Process has been terminated.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
                 simpleSound = new(@"c:\Windows\Media\Windows Hardware Remove.wav");
             }
@@ -393,7 +393,7 @@ namespace Pico2Dock
             { // Error
                 PercentText.Text = "Error";
 
-                StatusText.Text = errorMessage;
+                ChangeStateText(errorMessage);
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
                 simpleSound = new(@"c:\Windows\Media\Windows Error.wav");
             }
@@ -401,7 +401,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                StatusText.Text = $"Current Status:\nAll APK files have been modified.\nYou can install them using the APK files in the patched folder.";
+                ChangeStateText($"Current Status:\nAll APK files have been modified.\nYou can install them using the APK files in the patched folder.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\notify.wav");
             }
@@ -443,7 +443,7 @@ namespace Pico2Dock
             }
             catch (Exception ex)
             {
-                StatusText.Text = ex.ToString();
+                ChangeStateText(ex.ToString());
             }
 
             try
@@ -453,7 +453,7 @@ namespace Pico2Dock
             }
             catch (Exception ex)
             {
-                StatusText.Text = ex.ToString();
+                ChangeStateText(ex.ToString());
             }
 
             Tasks.KillTask();
@@ -461,8 +461,8 @@ namespace Pico2Dock
 
         private void ResetAppearance()
         {
+            ChangeStateText("");
             IsCancleProcess = false;
-            StatusText.Text = "";
             PercentText.Text = "";
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;
@@ -474,6 +474,11 @@ namespace Pico2Dock
                 DeleteButton.IsEnabled = true;
             else
                 DeleteButton.IsEnabled = false;
+        }
+
+        private void ChangeStateText(string text)
+        {
+            StatusText.Text = text;
         }
         #endregion
     }
