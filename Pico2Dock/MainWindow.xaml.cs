@@ -1,6 +1,5 @@
 ﻿using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Windows;
@@ -10,7 +9,6 @@ using System.Xml.Linq;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 using Button = Wpf.Ui.Controls.Button;
-using File = System.IO.File;
 
 namespace Pico2Dock
 {
@@ -25,7 +23,7 @@ namespace Pico2Dock
             this.DataContext = this;
 
             ApplicationThemeManager.Apply(this);
-            VersionText.Text = $"Version {GetAppVersion()}";
+            VersionText.Text = $"Version {Utils.GetAppVersion()}";
 
             ResetAppearance();
             ControlButton(1);
@@ -165,13 +163,13 @@ namespace Pico2Dock
 
         private void OpenOutput(object sender, RoutedEventArgs e)
         {
-            OpenExplorer("patched");
+            Utils.OpenExplorer("patched");
         }
         #endregion
 
-        private void IncressProgressBar(double count)
+        private void IncressProgressBar(double count, int time = 1)
         {
-            StatusProgressBar.Value += 10 / count;
+            StatusProgressBar.Value += (10 * time) / count;
             PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
         }
 
@@ -229,8 +227,10 @@ namespace Pico2Dock
                     _files.RemoveAt(index);
                     _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
+                    {
+                        IncressProgressBar(_files.Count, 4);
                         continue;
-
+                    }
                     else
                         goto skipMainTask;
                 }
@@ -287,8 +287,10 @@ namespace Pico2Dock
                     _files.RemoveAt(index);
                     _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
+                    {
+                        IncressProgressBar(_files.Count, 3);
                         continue;
-
+                    }
                     else
                         goto skipMainTask;
                 }
@@ -315,8 +317,10 @@ namespace Pico2Dock
                     _files.RemoveAt(index);
                     _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
+                    {
+                        IncressProgressBar(_files.Count, 2);
                         continue;
-
+                    }
                     else
                         goto skipMainTask;
                 }
@@ -357,7 +361,10 @@ namespace Pico2Dock
                     _files.RemoveAt(index);
                     _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
+                    {
+                        IncressProgressBar(_files.Count, 1);
                         continue;
+                    }
                     else
                         goto skipMainTask;
                 }
@@ -459,22 +466,6 @@ namespace Pico2Dock
             PercentText.Text = "";
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;
-        }
-
-        private static string GetAppVersion()
-        {
-            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown error reading assembly version";
-        }
-
-        private static void OpenExplorer(string filePath)
-        {
-            string args = string.Format("/e, /select, \"{0}\"", filePath);
-            ProcessStartInfo info = new()
-            {
-                FileName = "explorer",
-                Arguments = args
-            };
-            Process.Start(info);
         }
 
         private void DropBoxChangeDeleteButton(object sender, dynamic e)
