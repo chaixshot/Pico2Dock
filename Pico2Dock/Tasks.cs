@@ -117,9 +117,9 @@ namespace Pico2Dock
         {
             try
             {
-                decompiler?.Kill();
-                compiler?.Kill();
-                signer?.Kill();
+                decompiler?.Kill(true);
+                compiler?.Kill(true);
+                signer?.Kill(true);
             }
             catch (Exception)
             {
