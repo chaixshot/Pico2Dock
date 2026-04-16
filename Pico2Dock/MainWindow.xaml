@@ -120,7 +120,10 @@
                                 Drop="DropBox_Drop"
                                 ItemsSource="{Binding Path=Files}"
                                 KeyUp="DropBox_KeyUp"
-                                MouseDoubleClick="DropBox_MouseDoubleClick" />
+                                MouseDoubleClick="DropBox_MouseDoubleClick"
+                                ScrollViewer.CanContentScroll="True"
+                                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto" />
                             <ui:Button
                                 x:Name="DropBoxButton"
                                 Width="{Binding ActualWidth, ElementName=DropBox, Mode=OneWay}"
@@ -194,6 +197,7 @@
                         <ui:TextBox
                             x:Name="StatusText"
                             Height="100"
+                            HorizontalContentAlignment="Left"
                             IsReadOnly="True"
                             ScrollViewer.CanContentScroll="True"
                             ScrollViewer.VerticalScrollBarVisibility="Auto"
