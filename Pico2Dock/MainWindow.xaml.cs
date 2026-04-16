@@ -1,7 +1,9 @@
-﻿using Microsoft.Win32;
+﻿using MarkdView;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Media;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -22,7 +24,13 @@ namespace Pico2Dock
             InitializeComponent();
             this.DataContext = this;
 
-            ApplicationThemeManager.Apply(this);
+            // WPF-UI theme
+            ApplyTheme();
+            Loaded += (s, e) =>
+            {
+                SystemThemeWatcher.Watch(this, WindowBackdropType.Mica, true);
+                SystemEvents.UserPreferenceChanged += (s, e) => { ApplyTheme(); };
+            };
             VersionText.Text = $"Version {Utils.GetAppVersion()}";
 
             ResetAppearance();
@@ -30,6 +38,7 @@ namespace Pico2Dock
 
             DropBox.SizeChanged += DropBoxChangeDeleteButton;
             DropBox.SelectionChanged += DropBoxChangeDeleteButton;
+
         }
 
         #region Parameter
@@ -143,7 +152,7 @@ namespace Pico2Dock
                 MainTask();
             }
             else
-                ChangeStateText("ERROR: There is no file in process.");
+                ChangeStateText("### ERROR\nThere is no file in process.");
         }
 
         private void CancleProcess(object sender, RoutedEventArgs e)
@@ -184,7 +193,7 @@ namespace Pico2Dock
         {
             ControlButton(2);
 
-            string errorMessage = "";
+            string errorMessage = string.Empty;
 
             // Remove file indicator except error
             foreach (string filePath in _files.ToList())
@@ -192,7 +201,7 @@ namespace Pico2Dock
                 int index = _files.IndexOf(filePath);
 
                 _files.RemoveAt(index);
-                _files.Insert(index, filePath.Replace("🛠️ ", "").Replace("✔️ ", ""));
+                _files.Insert(index, filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty));
             }
 
             foreach (string filePath in _files.ToList())
@@ -201,6 +210,9 @@ namespace Pico2Dock
 
                 int index = _files.IndexOf(filePath);
                 string apkName = System.IO.Path.GetFileName(filePath);
+
+                // Replace invalid characters with empty string
+                apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", "");
 
                 // skip is file error from previous task
                 if (filePath.Contains("✖️"))
@@ -213,7 +225,7 @@ namespace Pico2Dock
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
-                ChangeStateText($"Current Status: Decompiling {apkName}...");
+                ChangeStateText($"### Current Status\nDecompiling **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
                 await Task.Run(() =>
@@ -226,24 +238,27 @@ namespace Pico2Dock
 
                 if (string.IsNullOrEmpty(errorMessage))
                 {
-                    ChangeStateText($"Current Status: Decompile {apkName} completed");
+                    ChangeStateText($"### Current Status\nDecompile **{apkName}** completed");
                     IncressProgressBar(_files.Count);
                 }
                 else
                 {
                     _files.RemoveAt(index);
-                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
                     {
+                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                         IncressProgressBar(_files.Count, 4);
                         continue;
                     }
                     else
+                    {
+                        _files.Insert(index, "✖️ " + filePath);
                         goto skipMainTask;
+                    }
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
-                ChangeStateText($"Current Status: Modifing AndroidManifest.xml of {apkName}...");
+                ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
                 XNamespace android = "http://schemas.android.com/apk/res/android";
@@ -269,11 +284,11 @@ namespace Pico2Dock
                 }
                 doc.Save("./worker/AndroidManifest.xml");
 
-                ChangeStateText($"Current Status: The file AndroidManifest.xml of {apkName} is modified successfully");
+                ChangeStateText($"### Current Status\nThe file **AndroidManifest.xml** of **{apkName}** is modified successfully");
                 IncressProgressBar(_files.Count);
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
-                ChangeStateText($"Current Status: Compiling {apkName}...");
+                ChangeStateText($"### Current Status\nCompiling **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
                 await Task.Run(() =>
@@ -286,24 +301,27 @@ namespace Pico2Dock
 
                 if (string.IsNullOrEmpty(errorMessage))
                 {
-                    ChangeStateText($"Current Status: Compile {apkName} completed");
+                    ChangeStateText($"### Current Status\nCompile **{apkName}** completed");
                     IncressProgressBar(_files.Count);
                 }
                 else
                 {
                     _files.RemoveAt(index);
-                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
                     {
+                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                         IncressProgressBar(_files.Count, 3);
                         continue;
                     }
                     else
+                    {
+                        _files.Insert(index, "✖️ " + filePath);
                         goto skipMainTask;
+                    }
                 }
 
                 //?? -------------------- [[ Start uber apk signer ]] --------------------
-                ChangeStateText($"Current Status: Signing {apkName}...");
+                ChangeStateText($"### Current Status\nSigning **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
                 await Task.Run(() =>
@@ -316,20 +334,23 @@ namespace Pico2Dock
 
                 if (string.IsNullOrEmpty(errorMessage))
                 {
-                    ChangeStateText($"Current Status: Sign {apkName} completed");
+                    ChangeStateText($"### Current Status\nSign **{apkName}** completed");
                     IncressProgressBar(_files.Count);
                 }
                 else
                 {
                     _files.RemoveAt(index);
-                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
                     {
+                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                         IncressProgressBar(_files.Count, 2);
                         continue;
                     }
                     else
+                    {
+                        _files.Insert(index, "✖️ " + filePath);
                         goto skipMainTask;
+                    }
                 }
 
                 //?? -------------------- [[ Rename ]] --------------------
@@ -359,21 +380,24 @@ namespace Pico2Dock
                         );
                     }
 
-                    ChangeStateText($"Current Status: Process {apkName} is successful");
+                    ChangeStateText($"### Current Status\nProcess **{apkName}** is successful");
                 }
                 else
                 {
-                    errorMessage = $"ERROR: Unable to compile file {apkName}";
+                    errorMessage = $"### ERROR\nUnable to compile file {apkName}";
 
                     _files.RemoveAt(index);
-                    _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                     if (_files.Count > 1)
                     {
+                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
                         IncressProgressBar(_files.Count, 1);
                         continue;
                     }
                     else
+                    {
+                        _files.Insert(index, "✖️ " + filePath);
                         goto skipMainTask;
+                    }
                 }
 
                 //?? -------------------- [[ File indicator ]] --------------------
@@ -394,7 +418,7 @@ namespace Pico2Dock
 
                 ChangeStateText("Process has been terminated.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
-                simpleSound = new(@"c:\Windows\Media\Windows Hardware Remove.wav");
+                simpleSound = new(@"c:\Windows\Media\Windows Hardware Fail.wav");
             }
             else if (!string.IsNullOrEmpty(errorMessage))
             { // Error
@@ -408,9 +432,9 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"Current Status:\nAll APK files have been modified.\nYou can install them using the APK files in the patched folder.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in the **patched** folder.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
-                simpleSound = new(@"c:\Windows\Media\notify.wav");
+                simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
 
             ControlButton(1);
@@ -450,7 +474,7 @@ namespace Pico2Dock
             }
             catch (Exception ex)
             {
-                ChangeStateText(ex.ToString());
+                ChangeStateText($"```{ex}```");
             }
 
             try
@@ -460,7 +484,7 @@ namespace Pico2Dock
             }
             catch (Exception ex)
             {
-                ChangeStateText(ex.ToString());
+                ChangeStateText($"```{ex}```");
             }
 
             Tasks.KillTask();
@@ -468,9 +492,9 @@ namespace Pico2Dock
 
         private void ResetAppearance()
         {
-            ChangeStateText("");
+            ChangeStateText(string.Empty);
             IsCancleProcess = false;
-            PercentText.Text = "";
+            PercentText.Text = string.Empty;
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;
         }
@@ -485,7 +509,15 @@ namespace Pico2Dock
 
         private void ChangeStateText(string text)
         {
-            StatusText.Text = text;
+            StatusText.Content = text;
+        }
+
+        public static void ApplyTheme()
+        {
+            string theme = ApplicationThemeManager.GetSystemTheme().ToString();
+
+            ThemeManager.ApplyTheme(theme == "Light" ? MarkdView.Enums.ThemeMode.Light : MarkdView.Enums.ThemeMode.Dark);
+            ApplicationThemeManager.ApplySystemTheme();
         }
         #endregion
     }

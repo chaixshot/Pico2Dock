@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MarkdView" Version="1.0.11" />
     <PackageReference Include="WPF-UI" Version="4.2.0" />
   </ItemGroup>
 

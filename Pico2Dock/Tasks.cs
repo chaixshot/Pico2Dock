@@ -35,12 +35,11 @@ namespace Pico2Dock
             }
             catch (Exception)
             {
-                return $"ERROR:\nUnable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
+                return $"### ERROR\nUnable to run java on machine.\nPlease install **Java 17** as recommended [here](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi).";
             }
 
-
             if (decompiler.ExitCode != 0)
-                return $"ERROR:\nfile {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
+                return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {decompiler.ExitCode}\n```{decompiler.StandardError.ReadToEnd()}```";
             else
                 return string.Empty;
         }
@@ -70,11 +69,11 @@ namespace Pico2Dock
             }
             catch (Exception)
             {
-                return $"ERROR:\nUnable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
+                return $"### ERROR\nUnable to run java on machine.\nPlease install **Java 17** as recommended [here](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi).";
             }
 
-            if (decompiler.ExitCode != 0)
-                return $"ERROR:\nfile {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
+            if (compiler.ExitCode != 0)
+                return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {compiler.ExitCode}\n```{compiler.StandardError.ReadToEnd()}```";
             else
                 return string.Empty;
         }
@@ -104,11 +103,11 @@ namespace Pico2Dock
             }
             catch (Exception)
             {
-                return $"ERROR:\nUnable to run java on machine.\nPlease install Java 17 as recommended.\nhttps://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi";
+                return $"### ERROR\nUnable to run java on machine.\nPlease install **Java 17** as recommended [here](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi).";
             }
 
-            if (decompiler.ExitCode != 0)
-                return $"ERROR:\nfile {apkName}\nExit Code: {decompiler.ExitCode}\nLast Output: {decompiler.StandardError.ReadToEnd()}";
+            if (signer.ExitCode != 0)
+                return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {signer.ExitCode}\n```{signer.StandardError.ReadToEnd()}```";
             else
                 return string.Empty;
         }
