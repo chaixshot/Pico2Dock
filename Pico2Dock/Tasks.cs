@@ -24,7 +24,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.1.jar\" decode \"{filePath}\" -q -o ./worker",
+                    Arguments = $"-jar \"src/apktool_3.0.1.jar\" decode \"{filePath}\" -q -f -o ./worker",
                 }
             };
 
@@ -112,7 +112,7 @@ namespace Pico2Dock
                 return string.Empty;
         }
 
-        public static void KillTask()
+        public static void KillTasks()
         {
             try
             {

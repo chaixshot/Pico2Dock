@@ -55,7 +55,7 @@ namespace Pico2Dock
 
         public static void OnClose()
         {
-            Tasks.KillTask();
+            Tasks.KillTasks();
         }
 
         #region Drag&Drop
@@ -160,7 +160,7 @@ namespace Pico2Dock
             if (!IsCancleProcess)
             {
                 IsCancleProcess = true;
-                Tasks.KillTask();
+                Tasks.KillTasks();
             }
         }
 
@@ -469,8 +469,11 @@ namespace Pico2Dock
         {
             try
             {
-                if (Directory.Exists("./singer"))
-                    Directory.Delete("./singer", true);
+                DirectoryInfo dir = new("./singer");
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    file.Delete();
+                }
             }
             catch (Exception ex)
             {
@@ -479,15 +482,19 @@ namespace Pico2Dock
 
             try
             {
-                if (Directory.Exists("./worker"))
-                    Directory.Delete("./worker", true);
+                foreach (FileInfo file in new DirectoryInfo("./worker").GetFiles())
+                {
+                    file.Delete();
+                }
+                foreach (string dir in Directory.GetDirectories("./worker"))
+                {
+                    Directory.Delete(dir, true);
+                }
             }
             catch (Exception ex)
             {
                 ChangeStateText($"```{ex}```");
             }
-
-            Tasks.KillTask();
         }
 
         private void ResetAppearance()
