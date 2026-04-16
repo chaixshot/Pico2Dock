@@ -93,7 +93,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/uber-apk-signer-1.3.0.jar\" -a \"./singer/{apkName}\" --ks \"src/testkey.jks\" --ksAlias \"testkey\" --ksKeyPass 114514 --ksPass 114514 --out \"./patched\"",
+                    Arguments = $"-jar \"src/uber-apk-signer-1.3.0.jar\" -a \"./singer/{apkName}\" --ks \"src/keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"./patched\"",
                 }
             };
 
