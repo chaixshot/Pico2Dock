@@ -188,9 +188,9 @@ namespace Pico2Dock
         }
         #endregion
 
-        private void IncressProgressBar(double count, int time = 1)
+        private void IncressProgressBar(double count, double time = 1)
         {
-            StatusProgressBar.Value += (6 * time) / count;
+            StatusProgressBar.Value += ((95 / 6) * time) / count;
             PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
         }
 
@@ -244,11 +244,11 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
+                    IncressProgressBar(_files.Count, 5);
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
                     {
                         _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        IncressProgressBar(_files.Count, 5);
                         continue;
                     }
                     else
@@ -419,11 +419,11 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
+                    IncressProgressBar(_files.Count, 3);
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
                     {
                         _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        IncressProgressBar(_files.Count, 3);
                         continue;
                     }
                     else
@@ -447,11 +447,11 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
+                    IncressProgressBar(_files.Count, 2);
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
                     {
                         _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        IncressProgressBar(_files.Count, 2);
                         continue;
                     }
                     else
@@ -493,11 +493,11 @@ namespace Pico2Dock
                 {
                     errorMessage = $"### ERROR\nUnable to compile file {apkName}";
 
+                    IncressProgressBar(_files.Count, 1);
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
                     {
                         _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        IncressProgressBar(_files.Count, 1);
                         continue;
                     }
                     else
