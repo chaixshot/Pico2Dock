@@ -105,7 +105,7 @@ namespace Pico2Dock
 
         private void DropBox_Click(object sender, RoutedEventArgs e)
         {
-            var dlg = new OpenFileDialog
+            OpenFileDialog dlg = new()
             {
                 Filter = "Android Package (*.apk)|*.apk",
                 Multiselect = true
@@ -113,7 +113,7 @@ namespace Pico2Dock
 
             dlg.ShowDialog();
 
-            foreach (var filePath in dlg.FileNames)
+            foreach (string filePath in dlg.FileNames)
                 _files.Add(filePath);
 
             DropBox_UpdateText();
@@ -206,13 +206,14 @@ namespace Pico2Dock
 
             foreach (string filePath in _files.ToList())
             {
-                DirectoryCleanup();
+                ChangeStateText($"### Current Status\nCleaning directory...");
+                await Task.Run(DirectoryCleanup);
 
                 int index = _files.IndexOf(filePath);
                 string apkName = System.IO.Path.GetFileName(filePath);
 
                 // Replace invalid characters with empty string
-                apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", "");
+                apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", string.Empty);
 
                 // skip is file error from previous task
                 if (filePath.Contains("✖️"))
@@ -439,7 +440,7 @@ namespace Pico2Dock
 
             ControlButton(1);
             IncressProgressBar(_files.Count);
-            DirectoryCleanup();
+            await Task.Run(DirectoryCleanup);
 
             // Play sound
             simpleSound.Play();
@@ -469,8 +470,7 @@ namespace Pico2Dock
         {
             try
             {
-                DirectoryInfo dir = new("./singer");
-                foreach (FileInfo file in dir.GetFiles())
+                foreach (FileInfo file in new DirectoryInfo("./singer").GetFiles())
                 {
                     file.Delete();
                 }
