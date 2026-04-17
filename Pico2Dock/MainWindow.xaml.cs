@@ -304,7 +304,11 @@ namespace Pico2Dock
                         foreach (XElement provider in androidManifestRoot.Descendants("application").Elements("provider"))
                         {
                             string value = provider.Attribute(android + "authorities").Value;
-                            provider.SetAttributeValue(android + "authorities", value.Replace(packageName, $"{packageName}{ranPrefix}"));
+
+                            if (value.Contains(packageName))
+                                provider.SetAttributeValue(android + "authorities", value.Replace(packageName, $"{packageName}{ranPrefix}"));
+                            else
+                                provider.SetAttributeValue(android + "authorities", $"{value}{ranPrefix}");
                         }
 
                         // Change permission
