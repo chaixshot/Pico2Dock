@@ -539,7 +539,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in the **patched** folder.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in the **patched** folder by clicking the button below.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
