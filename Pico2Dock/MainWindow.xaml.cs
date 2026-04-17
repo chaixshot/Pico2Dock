@@ -128,8 +128,7 @@ namespace Pico2Dock
         private void DropBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (DropBox.SelectedIndex > -1)
-                Utils.OpenExplorer(DropBox.SelectedValue.ToString());
-
+                Utils.OpenExplorer(DropBox.SelectedValue.ToString().Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty).Replace("✖️ ", string.Empty));
         }
 
         private void DropBox_UpdateText()
