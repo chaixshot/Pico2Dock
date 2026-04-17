@@ -262,12 +262,13 @@ namespace Pico2Dock
                 IncressProgressBar(_files.Count);
 
                 bool isRePackage = (bool)CheckBoxPackname.IsChecked;
+                bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
                 string namePrefix = AppNamePrefix.Text;
                 await Task.Run(() =>
                 {
                     XNamespace android = "http://schemas.android.com/apk/res/android";
                     XDocument xmlFile = XDocument.Load("./worker/AndroidManifest.xml");
-                    XElement androidManifestRoot = xmlFile.Root;
+                    XElement xmlRoot = xmlFile.Root;
 
                     // Add docked attribute
                     if (true)
@@ -276,16 +277,16 @@ namespace Pico2Dock
                         metaData.SetAttributeValue(android + "name", "pico.vr.position");
                         metaData.SetAttributeValue(android + "value", "near");
 
-                        foreach (XElement activity in androidManifestRoot.Descendants("application").Elements("activity"))
+                        foreach (XElement activity in xmlRoot.Descendants("application").Elements("activity"))
                             activity.Add(metaData);
-                        foreach (XElement alias in androidManifestRoot.Descendants("application").Elements("activity-alias"))
+                        foreach (XElement alias in xmlRoot.Descendants("application").Elements("activity-alias"))
                             alias.Add(metaData);
                     }
 
                     // Allow to update
                     if (true)
                     {
-                        XElement application = androidManifestRoot.Element("application");
+                        XElement application = xmlRoot.Element("application");
                         XElement metaData = new("meta-data");
 
                         metaData.SetAttributeValue(android + "name", "isPUI");
@@ -296,26 +297,59 @@ namespace Pico2Dock
                     // Random package name
                     if (isRePackage)
                     {
-                        string packageName = androidManifestRoot.Attribute("package").Value;
+                        string packageName = xmlRoot.Attribute("package").Value;
                         string ranPrefix = Utils.GenerateString(6);
+                        string newPackageName = $"{packageName}{ranPrefix}";
 
                         // Change package name
-                        androidManifestRoot.Attribute("package").SetValue($"{packageName}{ranPrefix}");
-                        foreach (XElement provider in androidManifestRoot.Descendants("application").Elements("provider"))
+                        xmlRoot.Attribute("package").SetValue(newPackageName);
+
+                        if (isAdvMode)
+                        {
+                            XAttribute sharedUserId = xmlRoot.Attribute(android + "sharedUserId");
+                            if (sharedUserId != null)
+                            {
+                                string value = sharedUserId.Value;
+                                xmlRoot.Attribute(android + "sharedUserId").SetValue(value.Replace(packageName, newPackageName));
+                            }
+                        }
+
+                        foreach (XElement provider in xmlRoot.Descendants("application").Elements("provider"))
                         {
                             string value = provider.Attribute(android + "authorities").Value;
 
                             if (value.Contains(packageName))
-                                provider.SetAttributeValue(android + "authorities", value.Replace(packageName, $"{packageName}{ranPrefix}"));
+                                provider.SetAttributeValue(android + "authorities", value.Replace(packageName, newPackageName));
                             else
                                 provider.SetAttributeValue(android + "authorities", $"{value}{ranPrefix}");
                         }
 
                         // Change permission
-                        foreach (XElement permissions in androidManifestRoot.Descendants("permission"))
+                        foreach (XElement permissions in xmlRoot.Descendants("permission"))
                         {
                             string value = permissions.Attribute(android + "name").Value;
-                            permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                            if (isAdvMode)
+                                permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                            else
+                                permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                        }
+
+                        foreach (XElement permissions in xmlRoot.Descendants("uses-permission"))
+                        {
+                            string value = permissions.Attribute(android + "name").Value;
+                            if (isAdvMode)
+                                permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                            else
+                                permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                        }
+
+                        if (isAdvMode)
+                        {
+                            foreach (XElement permissions in xmlRoot.Descendants("activity-alias"))
+                            {
+                                string value = permissions.Attribute(android + "name").Value;
+                                permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                            }
                         }
                     }
 
@@ -324,7 +358,7 @@ namespace Pico2Dock
                     // Change app name
                     if (!string.IsNullOrEmpty(namePrefix))
                     {
-                        XElement application = androidManifestRoot.Element("application");
+                        XElement application = xmlRoot.Element("application");
                         string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
 
                         foreach (DirectoryInfo dir in new DirectoryInfo("./worker/res").GetDirectories())

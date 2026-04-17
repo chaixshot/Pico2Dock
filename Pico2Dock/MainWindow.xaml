@@ -151,7 +151,10 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                        <StackPanel
+                            Margin="0,3,0,0"
+                            VerticalAlignment="Top"
+                            Orientation="Horizontal">
                             <ui:Button
                                 x:Name="StartButton"
                                 Click="StartProcess"
@@ -189,19 +192,37 @@
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
 
-                            <ui:Card Padding="10,1,10,1">
-                                <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                    <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
-                                    <ui:TextBlock
-                                        Padding="0,5,0,0"
-                                        FontSize="16"
-                                        Text="Random package name" />
-                                </StackPanel>
-                            </ui:Card>
+                            <StackPanel>
+                                <ui:Card Padding="10,1,10,1">
+                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                        <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
+                                        <ui:TextBlock
+                                            Padding="0,5,0,0"
+                                            FontSize="16"
+                                            Text="New package name"
+                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxPackname}" />
+                                    </StackPanel>
+                                </ui:Card>
+
+                                <ui:Card Margin="0,3,0,0" Padding="10,1,10,1">
+                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                        <CheckBox
+                                            x:Name="CheckBoxPackAdv"
+                                            IsEnabled="{Binding IsChecked, ElementName=CheckBoxPackname}"
+                                            ToolTip="Rename the package name in advanced mode if normal is not working." />
+                                        <ui:TextBlock
+                                            Padding="0,5,0,0"
+                                            FontSize="16"
+                                            Text="Advanced mode"
+                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxPackDex}" />
+                                    </StackPanel>
+                                </ui:Card>
+                            </StackPanel>
 
                             <ui:TextBox
                                 x:Name="AppNamePrefix"
                                 Margin="5,0,0,0"
+                                VerticalAlignment="Top"
                                 PlaceholderText="After app name"
                                 ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
                         </StackPanel>
