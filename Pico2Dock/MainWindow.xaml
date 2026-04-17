@@ -192,39 +192,61 @@
                             HorizontalAlignment="Right"
                             Orientation="Horizontal">
 
-                            <StackPanel>
-                                <ui:Card Padding="10,1,10,1">
-                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                        <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
-                                        <ui:TextBlock
-                                            Padding="0,5,0,0"
-                                            FontSize="16"
-                                            Text="New package name"
-                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxPackname}" />
-                                    </StackPanel>
-                                </ui:Card>
+                            <ui:Card Padding="10">
+                                <StackPanel>
+                                    <ui:Card Padding="10,1,10,1">
+                                        <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                            <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
+                                            <ui:TextBlock
+                                                Padding="0,5,0,0"
+                                                FontSize="16"
+                                                Text="New package name"
+                                                ToolTip="{Binding ToolTip, ElementName=CheckBoxPackname}" />
+                                        </StackPanel>
+                                    </ui:Card>
 
-                                <ui:Card Margin="0,3,0,0" Padding="10,1,10,1">
-                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                        <CheckBox
-                                            x:Name="CheckBoxPackAdv"
-                                            IsEnabled="{Binding IsChecked, ElementName=CheckBoxPackname}"
-                                            ToolTip="Rename the package name in advanced mode if normal is not working." />
-                                        <ui:TextBlock
-                                            Padding="0,5,0,0"
-                                            FontSize="16"
-                                            Text="Advanced mode"
-                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxPackDex}" />
-                                    </StackPanel>
-                                </ui:Card>
-                            </StackPanel>
+                                    <ui:Card Margin="0,5,0,0" Padding="10,1,10,1">
+                                        <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                            <CheckBox
+                                                x:Name="CheckBoxPackAdv"
+                                                IsEnabled="{Binding IsChecked, ElementName=CheckBoxPackname}"
+                                                ToolTip="Rename the package name in advanced mode if normal is not working." />
+                                            <ui:TextBlock
+                                                Padding="0,5,0,0"
+                                                FontSize="16"
+                                                Text="Advanced mode"
+                                                ToolTip="{Binding ToolTip, ElementName=CheckBoxPackAdv}" />
+                                        </StackPanel>
+                                    </ui:Card>
+                                </StackPanel>
+                            </ui:Card>
 
-                            <ui:TextBox
-                                x:Name="AppNamePrefix"
-                                Margin="5,0,0,0"
-                                VerticalAlignment="Top"
-                                PlaceholderText="After app name"
-                                ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
+                            <ui:Card Margin="5,0,0,0" Padding="10">
+                                <StackPanel>
+                                    <ui:TextBox
+                                        x:Name="AppNamePrefix"
+                                        MinWidth="150"
+                                        MaxWidth="150"
+                                        VerticalAlignment="Top"
+                                        PlaceholderText="After app name"
+                                        TextChanged="AppNamePrefix_TextChanged"
+                                        ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
+
+                                    <ui:Card Margin="0,5,0,0" Padding="10,1,10,1">
+                                        <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                            <CheckBox
+                                                x:Name="CheckBoxRename"
+                                                IsEnabled="False"
+                                                ToolTip="Change the entire app name instead of adding text after." />
+                                            <ui:TextBlock
+                                                Padding="0,5,0,0"
+                                                FontSize="16"
+                                                Text="Rename"
+                                                ToolTip="{Binding ToolTip, ElementName=CheckBoxRename}" />
+                                        </StackPanel>
+                                    </ui:Card>
+                                </StackPanel>
+                            </ui:Card>
                         </StackPanel>
                     </Grid>
 

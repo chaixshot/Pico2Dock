@@ -180,6 +180,12 @@ namespace Pico2Dock
         {
             Utils.OpenExplorer("patched");
         }
+
+        private void AppNamePrefix_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            TextBox prefix = sender as TextBox;
+            CheckBoxRename.IsEnabled = prefix.Text.Length > 0;
+        }
         #endregion
 
         private void IncressProgressBar(double count, int time = 1)
