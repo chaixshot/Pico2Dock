@@ -170,7 +170,7 @@ namespace Pico2Dock
             DropBox_UpdateText();
         }
 
-        private void DeleteFiles(object sender, RoutedEventArgs e)
+        private void RemoveFiles(object sender, RoutedEventArgs e)
         {
             if (DropBox.SelectedIndex > -1 && StartButton.IsEnabled)
                 _files.RemoveAt(DropBox.SelectedIndex);
@@ -262,7 +262,7 @@ namespace Pico2Dock
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
-                bool isDockMode = (bool)SwitchDockMode.IsChecked;
+                bool isDockMode = (bool)SwitchHideDock.IsChecked;
                 bool isRePackage = (bool)CheckBoxPackname.IsChecked;
                 bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
                 string namePrefix = AppNamePrefix.Text;
@@ -614,9 +614,9 @@ namespace Pico2Dock
         private void DropBoxChangeDeleteButton(object sender, dynamic e)
         {
             if (StartButton.IsEnabled && DropBox.SelectedIndex != -1)
-                DeleteButton.IsEnabled = true;
+                RemoveButton.IsEnabled = true;
             else
-                DeleteButton.IsEnabled = false;
+                RemoveButton.IsEnabled = false;
         }
 
         private void ChangeStateText(string text)

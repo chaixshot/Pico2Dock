@@ -10,6 +10,8 @@
     Title="Pico2Dock"
     MinWidth="700"
     MinHeight="750"
+    d:DesignHeight="900"
+    d:DesignWidth="800"
     Background="Transparent"
     ExtendsContentIntoTitleBar="True"
     WindowBackdropType="Mica"
@@ -146,66 +148,66 @@
 
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel>
-                            <StackPanel
-                                Margin="0,3,0,0"
-                                VerticalAlignment="Top"
-                                Orientation="Horizontal">
-                                <ui:Button
-                                    x:Name="StartButton"
-                                    Click="StartProcess"
-                                    Content="Start"
-                                    ToolTip="Start contert process" />
+                        <WrapPanel VerticalAlignment="Top" Orientation="Horizontal">
+                            <ui:Button
+                                x:Name="StartButton"
+                                Width="75"
+                                Margin="0,5,5,0"
+                                Click="StartProcess"
+                                Content="Start"
+                                ToolTip="Start contert process" />
 
-                                <ui:Button
-                                    x:Name="CancleButton"
-                                    Margin="5,0,0,0"
-                                    Click="CancleProcess"
-                                    Content="Cancle"
-                                    IsEnabled="False"
-                                    ToolTip="Terminate processing task" />
+                            <ui:Button
+                                x:Name="CancleButton"
+                                Width="75"
+                                Margin="0,5,5,0"
+                                Click="CancleProcess"
+                                Content="Cancle"
+                                IsEnabled="False"
+                                ToolTip="Terminate processing task" />
 
-                                <ui:Button
-                                    x:Name="ClearButton"
-                                    Margin="5,0,0,0"
-                                    Click="ClearFiles"
-                                    Content="Clear"
-                                    ToolTip="Clear all files" />
+                            <ui:Button
+                                x:Name="ClearButton"
+                                Width="75"
+                                Margin="0,5,5,0"
+                                Click="ClearFiles"
+                                Content="Clear"
+                                ToolTip="Clear all files" />
 
-                                <ui:Button
-                                    x:Name="DeleteButton"
-                                    Margin="5,0,0,0"
-                                    Click="DeleteFiles"
-                                    Content="Delete"
-                                    ToolTip="Delete current select file" />
-                            </StackPanel>
-
-                            <ui:Card
-                                Margin="0,3,0,0"
-                                Padding="10"
-                                VerticalAlignment="Top">
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                    <ui:TextBlock x:Name="textBlock" Text="Docked Hide" />
-                                    <ui:ToggleSwitch
-                                        x:Name="SwitchDockMode"
-                                        Margin="10,0"
-                                        IsChecked="True" />
-                                    <ui:TextBlock Width="{Binding Width, ElementName=textBlock}" Text="Docked" />
-                                </StackPanel>
-                            </ui:Card>
-                        </StackPanel>
+                            <ui:Button
+                                x:Name="RemoveButton"
+                                Width="75"
+                                Margin="0,5,5,0"
+                                Click="RemoveFiles"
+                                Content="Remove"
+                                ToolTip="Remove current select file" />
+                        </WrapPanel>
 
                         <StackPanel
                             Grid.Column="1"
-                            Margin="0,3,0,0"
                             HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
                             Orientation="Horizontal">
 
-                            <ui:Card Padding="10">
+                            <ui:Card
+                                Margin="0,5,5,0"
+                                Padding="10"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top">
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <ui:ToggleSwitch x:Name="SwitchHideDock" />
+                                    <ui:TextBlock
+                                        x:Name="textBlock"
+                                        Margin="5,0,0,0"
+                                        Text="Docked Hide" />
+                                </StackPanel>
+                            </ui:Card>
+
+                            <ui:Card Margin="0,5,5,0" Padding="10">
                                 <StackPanel>
                                     <ui:Card Padding="10,1,10,1">
                                         <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
@@ -234,13 +236,14 @@
                                 </StackPanel>
                             </ui:Card>
 
-                            <ui:Card Margin="5,0,0,0" Padding="10">
+                            <ui:Card Margin="0,5,5,0" Padding="10">
                                 <StackPanel>
                                     <ui:TextBox
                                         x:Name="AppNamePrefix"
                                         MinWidth="150"
                                         MaxWidth="150"
                                         VerticalAlignment="Top"
+                                        MaxLength="15"
                                         PlaceholderText="After app name"
                                         TextChanged="AppNamePrefix_TextChanged"
                                         ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
@@ -271,13 +274,15 @@
                             </Grid.ColumnDefinitions>
                             <ProgressBar
                                 x:Name="StatusProgressBar"
-                                Height="20"
+                                Height="22"
                                 Value="40" />
                             <ui:TextBlock
                                 x:Name="PercentText"
-                                Margin="10,0,0,0"
+                                Margin="10,1,0,0"
                                 HorizontalAlignment="Center"
-                                Foreground="White" />
+                                FontWeight="Bold"
+                                Foreground="White"
+                                Opacity="0.7" />
                         </Grid>
 
                         <ui:Card Padding="0">
