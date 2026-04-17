@@ -145,38 +145,67 @@
                         </Grid>
                     </ui:Card>
 
-                    <StackPanel
-                        Grid.Row="2"
-                        Margin="0,3,0,0"
-                        Orientation="Horizontal">
-                        <ui:Button
-                            x:Name="StartButton"
-                            Click="StartProcess"
-                            Content="Start"
-                            ToolTip="Start contert process" />
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
 
-                        <ui:Button
-                            x:Name="CancleButton"
-                            Margin="5,0,0,0"
-                            Click="CancleProcess"
-                            Content="Cancle"
-                            IsEnabled="False"
-                            ToolTip="Terminate processing task" />
+                        <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                            <ui:Button
+                                x:Name="StartButton"
+                                Click="StartProcess"
+                                Content="Start"
+                                ToolTip="Start contert process" />
 
-                        <ui:Button
-                            x:Name="ClearButton"
-                            Margin="5,0,0,0"
-                            Click="ClearFiles"
-                            Content="Clear"
-                            ToolTip="Clear all files" />
+                            <ui:Button
+                                x:Name="CancleButton"
+                                Margin="5,0,0,0"
+                                Click="CancleProcess"
+                                Content="Cancle"
+                                IsEnabled="False"
+                                ToolTip="Terminate processing task" />
 
-                        <ui:Button
-                            x:Name="DeleteButton"
-                            Margin="5,0,0,0"
-                            Click="DeleteFiles"
-                            Content="Delete"
-                            ToolTip="Delete current select file" />
-                    </StackPanel>
+                            <ui:Button
+                                x:Name="ClearButton"
+                                Margin="5,0,0,0"
+                                Click="ClearFiles"
+                                Content="Clear"
+                                ToolTip="Clear all files" />
+
+                            <ui:Button
+                                x:Name="DeleteButton"
+                                Margin="5,0,0,0"
+                                Click="DeleteFiles"
+                                Content="Delete"
+                                ToolTip="Delete current select file" />
+
+
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="1"
+                            Margin="0,3,0,0"
+                            HorizontalAlignment="Right"
+                            Orientation="Horizontal">
+
+                            <ui:Card Padding="10,1,10,1">
+                                <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                    <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
+                                    <ui:TextBlock
+                                        Padding="0,5,0,0"
+                                        FontSize="16"
+                                        Text="Random package name" />
+                                </StackPanel>
+                            </ui:Card>
+
+                            <ui:TextBox
+                                x:Name="AppNamePrefix"
+                                Margin="5,0,0,0"
+                                PlaceholderText="After app name"
+                                ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
+                        </StackPanel>
+                    </Grid>
 
                     <StackPanel Grid.Row="3" Margin="0,30,0,0">
                         <Grid>

@@ -261,28 +261,91 @@ namespace Pico2Dock
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
-                XNamespace android = "http://schemas.android.com/apk/res/android";
-                XDocument doc = XDocument.Load("./worker/AndroidManifest.xml");
-                XElement root = doc.Root;
-
-                // Traverse all <activity> nodes
-                foreach (var activity in root.Descendants("application").Elements("activity"))
+                bool isRePackage = (bool)CheckBoxPackname.IsChecked;
+                string namePrefix = AppNamePrefix.Text;
+                await Task.Run(() =>
                 {
-                    var metaData = new XElement("meta-data");
-                    metaData.SetAttributeValue(android + "name", "pico.vr.position");
-                    metaData.SetAttributeValue(android + "value", "near");
-                    activity.Add(metaData);
-                }
+                    XNamespace android = "http://schemas.android.com/apk/res/android";
+                    XDocument xmlFile = XDocument.Load("./worker/AndroidManifest.xml");
+                    XElement androidManifestRoot = xmlFile.Root;
 
-                // Traverse all <activity-alias> nodes
-                foreach (var alias in root.Descendants("application").Elements("activity-alias"))
-                {
-                    var metaData = new XElement("meta-data");
-                    metaData.SetAttributeValue(android + "name", "pico.vr.position");
-                    metaData.SetAttributeValue(android + "value", "near");
-                    alias.Add(metaData);
-                }
-                doc.Save("./worker/AndroidManifest.xml");
+                    // Add docked attribute
+                    if (true)
+                    {
+                        XElement metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "pico.vr.position");
+                        metaData.SetAttributeValue(android + "value", "near");
+
+                        foreach (XElement activity in androidManifestRoot.Descendants("application").Elements("activity"))
+                            activity.Add(metaData);
+                        foreach (XElement alias in androidManifestRoot.Descendants("application").Elements("activity-alias"))
+                            alias.Add(metaData);
+                    }
+
+                    // Allow to update
+                    if (true)
+                    {
+                        XElement application = androidManifestRoot.Element("application");
+                        XElement metaData = new("meta-data");
+
+                        metaData.SetAttributeValue(android + "name", "isPUI");
+                        metaData.SetAttributeValue(android + "value", "1");
+                        application.Add(metaData);
+                    }
+
+                    // Random package name
+                    if (isRePackage)
+                    {
+                        string packageName = androidManifestRoot.Attribute("package").Value;
+                        string ranPrefix = Utils.GenerateString(6);
+
+                        // Change package name
+                        androidManifestRoot.Attribute("package").SetValue($"{packageName}{ranPrefix}");
+                        foreach (XElement provider in androidManifestRoot.Descendants("application").Elements("provider"))
+                        {
+                            string value = provider.Attribute(android + "authorities").Value;
+                            provider.SetAttributeValue(android + "authorities", value.Replace(packageName, $"{packageName}{ranPrefix}"));
+                        }
+
+                        // Change permission
+                        foreach (XElement permissions in androidManifestRoot.Descendants("permission"))
+                        {
+                            string value = permissions.Attribute(android + "name").Value;
+                            permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                        }
+                    }
+
+                    xmlFile.Save("./worker/AndroidManifest.xml");
+
+                    // Change app name
+                    if (!string.IsNullOrEmpty(namePrefix))
+                    {
+                        XElement application = androidManifestRoot.Element("application");
+                        string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
+
+                        foreach (DirectoryInfo dir in new DirectoryInfo("./worker/res").GetDirectories())
+                        {
+                            if (dir.Name.Contains("values"))
+                            {
+                                foreach (FileInfo file in dir.GetFiles("strings.xml"))
+                                {
+                                    XDocument stringFile = XDocument.Load(file.FullName);
+                                    XElement stringRoot = stringFile.Root;
+
+                                    foreach (XElement srt in stringRoot.Elements("string"))
+                                    {
+                                        if (srt.Attribute("name").Value.Contains(stringID))
+                                        {
+                                            srt.SetValue($"{srt.Value}{namePrefix}");
+                                        }
+                                    }
+
+                                    stringFile.Save(file.FullName);
+                                }
+                            }
+                        }
+                    }
+                });
 
                 ChangeStateText($"### Current Status\nThe file **AndroidManifest.xml** of **{apkName}** is modified successfully");
                 IncressProgressBar(_files.Count);
