@@ -8,7 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Title="Pico2Dock"
-    MinWidth="500"
+    MinWidth="700"
     MinHeight="750"
     Background="Transparent"
     ExtendsContentIntoTitleBar="True"
@@ -78,7 +78,7 @@
                             <ui:TextBlock
                                 FontTypography="Subtitle"
                                 Foreground="White"
-                                Text="Convert the APK app from normal floating to Dashboard Dock for Pico 4, alike File Manager."
+                                Text="Convert the APK app from Floating to Dashboard Dock for Pico 4, alike File Manager."
                                 TextWrapping="Wrap" />
                             <ui:TextBlock
                                 FontTypography="BodyStrong"
@@ -105,7 +105,6 @@
                             </StackPanel>
                         </StackPanel>
                     </ui:Card>
-
 
                     <ui:Card
                         Grid.Row="1"
@@ -147,43 +146,57 @@
 
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <StackPanel
-                            Margin="0,3,0,0"
-                            VerticalAlignment="Top"
-                            Orientation="Horizontal">
-                            <ui:Button
-                                x:Name="StartButton"
-                                Click="StartProcess"
-                                Content="Start"
-                                ToolTip="Start contert process" />
+                        <StackPanel>
+                            <StackPanel
+                                Margin="0,3,0,0"
+                                VerticalAlignment="Top"
+                                Orientation="Horizontal">
+                                <ui:Button
+                                    x:Name="StartButton"
+                                    Click="StartProcess"
+                                    Content="Start"
+                                    ToolTip="Start contert process" />
 
-                            <ui:Button
-                                x:Name="CancleButton"
-                                Margin="5,0,0,0"
-                                Click="CancleProcess"
-                                Content="Cancle"
-                                IsEnabled="False"
-                                ToolTip="Terminate processing task" />
+                                <ui:Button
+                                    x:Name="CancleButton"
+                                    Margin="5,0,0,0"
+                                    Click="CancleProcess"
+                                    Content="Cancle"
+                                    IsEnabled="False"
+                                    ToolTip="Terminate processing task" />
 
-                            <ui:Button
-                                x:Name="ClearButton"
-                                Margin="5,0,0,0"
-                                Click="ClearFiles"
-                                Content="Clear"
-                                ToolTip="Clear all files" />
+                                <ui:Button
+                                    x:Name="ClearButton"
+                                    Margin="5,0,0,0"
+                                    Click="ClearFiles"
+                                    Content="Clear"
+                                    ToolTip="Clear all files" />
 
-                            <ui:Button
-                                x:Name="DeleteButton"
-                                Margin="5,0,0,0"
-                                Click="DeleteFiles"
-                                Content="Delete"
-                                ToolTip="Delete current select file" />
+                                <ui:Button
+                                    x:Name="DeleteButton"
+                                    Margin="5,0,0,0"
+                                    Click="DeleteFiles"
+                                    Content="Delete"
+                                    ToolTip="Delete current select file" />
+                            </StackPanel>
 
-
+                            <ui:Card
+                                Margin="0,3,0,0"
+                                Padding="10"
+                                VerticalAlignment="Top">
+                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                    <ui:TextBlock x:Name="textBlock" Text="Docked Hide" />
+                                    <ui:ToggleSwitch
+                                        x:Name="SwitchDockMode"
+                                        Margin="10,0"
+                                        IsChecked="True" />
+                                    <ui:TextBlock Width="{Binding Width, ElementName=textBlock}" Text="Docked" />
+                                </StackPanel>
+                            </ui:Card>
                         </StackPanel>
 
                         <StackPanel

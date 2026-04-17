@@ -267,9 +267,11 @@ namespace Pico2Dock
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
+                bool isDockMode = (bool)SwitchDockMode.IsChecked;
                 bool isRePackage = (bool)CheckBoxPackname.IsChecked;
                 bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
                 string namePrefix = AppNamePrefix.Text;
+                bool isRename = (bool)CheckBoxRename.IsChecked;
                 await Task.Run(() =>
                 {
                     XNamespace android = "http://schemas.android.com/apk/res/android";
@@ -281,7 +283,7 @@ namespace Pico2Dock
                     {
                         XElement metaData = new("meta-data");
                         metaData.SetAttributeValue(android + "name", "pico.vr.position");
-                        metaData.SetAttributeValue(android + "value", "near");
+                        metaData.SetAttributeValue(android + "value", isDockMode ? "near" : "near_dialog");
 
                         foreach (XElement activity in xmlRoot.Descendants("application").Elements("activity"))
                             activity.Add(metaData);
@@ -289,7 +291,7 @@ namespace Pico2Dock
                             alias.Add(metaData);
                     }
 
-                    // Allow to update
+                    // Pico tag
                     if (true)
                     {
                         XElement application = xmlRoot.Element("application");
@@ -297,6 +299,16 @@ namespace Pico2Dock
 
                         metaData.SetAttributeValue(android + "name", "isPUI");
                         metaData.SetAttributeValue(android + "value", "1");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "pvr.vrshell.mode");
+                        metaData.SetAttributeValue(android + "value", "1");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "pico_permission_dim_show");
+                        metaData.SetAttributeValue(android + "value", "false");
                         application.Add(metaData);
                     }
 
@@ -359,36 +371,43 @@ namespace Pico2Dock
                         }
                     }
 
-                    xmlFile.Save("./worker/AndroidManifest.xml");
 
                     // Change app name
                     if (!string.IsNullOrEmpty(namePrefix))
                     {
                         XElement application = xmlRoot.Element("application");
-                        string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
 
-                        foreach (DirectoryInfo dir in new DirectoryInfo("./worker/res").GetDirectories())
+                        if (isRename)
+                            application.Attribute(android + "label").SetValue(namePrefix);
+                        else
                         {
-                            if (dir.Name.Contains("values"))
+                            string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
+
+                            foreach (DirectoryInfo dir in new DirectoryInfo("./worker/res").GetDirectories())
                             {
-                                foreach (FileInfo file in dir.GetFiles("strings.xml"))
+                                if (dir.Name.Contains("values"))
                                 {
-                                    XDocument stringFile = XDocument.Load(file.FullName);
-                                    XElement stringRoot = stringFile.Root;
-
-                                    foreach (XElement srt in stringRoot.Elements("string"))
+                                    foreach (FileInfo file in dir.GetFiles("strings.xml"))
                                     {
-                                        if (srt.Attribute("name").Value.Contains(stringID))
-                                        {
-                                            srt.SetValue($"{srt.Value}{namePrefix}");
-                                        }
-                                    }
+                                        XDocument stringFile = XDocument.Load(file.FullName);
+                                        XElement stringRoot = stringFile.Root;
 
-                                    stringFile.Save(file.FullName);
+                                        foreach (XElement srt in stringRoot.Elements("string"))
+                                        {
+                                            if (srt.Attribute("name").Value.Contains(stringID))
+                                            {
+                                                srt.SetValue($"{srt.Value}{namePrefix}");
+                                            }
+                                        }
+
+                                        stringFile.Save(file.FullName);
+                                    }
                                 }
                             }
                         }
                     }
+
+                    xmlFile.Save("./worker/AndroidManifest.xml");
                 });
 
                 ChangeStateText($"### Current Status\nThe file **AndroidManifest.xml** of **{apkName}** is modified successfully");
@@ -517,7 +536,7 @@ namespace Pico2Dock
         skipMainTask:
             SoundPlayer simpleSound;
 
-            StatusProgressBar.Value = 100;
+            await Task.Run(DirectoryCleanup);
 
             if (IsCancleProcess)
             { // Terminate
@@ -545,8 +564,7 @@ namespace Pico2Dock
             }
 
             ControlButton(1);
-            IncressProgressBar(_files.Count);
-            await Task.Run(DirectoryCleanup);
+            StatusProgressBar.Value = 100;
 
             // Play sound
             simpleSound.Play();
