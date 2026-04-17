@@ -190,7 +190,7 @@ namespace Pico2Dock
 
         private void IncressProgressBar(double count, int time = 1)
         {
-            StatusProgressBar.Value += (10 * time) / count;
+            StatusProgressBar.Value += (6 * time) / count;
             PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
         }
 
@@ -242,18 +242,13 @@ namespace Pico2Dock
                 if (IsCancleProcess)
                     goto skipMainTask;
 
-                if (string.IsNullOrEmpty(errorMessage))
-                {
-                    ChangeStateText($"### Current Status\nDecompile **{apkName}** completed");
-                    IncressProgressBar(_files.Count);
-                }
-                else
+                if (!string.IsNullOrEmpty(errorMessage))
                 {
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
                     {
                         _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        IncressProgressBar(_files.Count, 4);
+                        IncressProgressBar(_files.Count, 5);
                         continue;
                     }
                     else
@@ -410,9 +405,6 @@ namespace Pico2Dock
                     xmlFile.Save("./worker/AndroidManifest.xml");
                 });
 
-                ChangeStateText($"### Current Status\nThe file **AndroidManifest.xml** of **{apkName}** is modified successfully");
-                IncressProgressBar(_files.Count);
-
                 //?? -------------------- [[ Start compiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nCompiling **{apkName}**...");
                 IncressProgressBar(_files.Count);
@@ -425,12 +417,7 @@ namespace Pico2Dock
                 if (IsCancleProcess)
                     goto skipMainTask;
 
-                if (string.IsNullOrEmpty(errorMessage))
-                {
-                    ChangeStateText($"### Current Status\nCompile **{apkName}** completed");
-                    IncressProgressBar(_files.Count);
-                }
-                else
+                if (!string.IsNullOrEmpty(errorMessage))
                 {
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
@@ -458,12 +445,7 @@ namespace Pico2Dock
                 if (IsCancleProcess)
                     goto skipMainTask;
 
-                if (string.IsNullOrEmpty(errorMessage))
-                {
-                    ChangeStateText($"### Current Status\nSign **{apkName}** completed");
-                    IncressProgressBar(_files.Count);
-                }
-                else
+                if (!string.IsNullOrEmpty(errorMessage))
                 {
                     _files.RemoveAt(index);
                     if (_files.Count > 1)
@@ -480,6 +462,7 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Rename ]] --------------------
+                ChangeStateText($"### Current Status\nFinishing **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
                 bool signedFile = File.Exists($"./patched/{apkName[..^4]}-aligned-signed.apk");
@@ -505,8 +488,6 @@ namespace Pico2Dock
                             $"./patched/PICO_{apkName[..^4]}.apk"
                         );
                     }
-
-                    ChangeStateText($"### Current Status\nProcess **{apkName}** is successful");
                 }
                 else
                 {
