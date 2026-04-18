@@ -199,11 +199,12 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top">
                                 <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                    <ui:ToggleSwitch x:Name="SwitchHideDock" />
+                                    <ui:ToggleSwitch x:Name="SwitchHideDock" ToolTip="Put the app on to of everything incluing dock and keyboard" />
                                     <ui:TextBlock
                                         x:Name="textBlock"
                                         Margin="5,0,0,0"
-                                        Text="Docked Hide" />
+                                        Text="Hide Dock"
+                                        ToolTip="{Binding ToolTip, ElementName=SwitchHideDock}" />
                                 </StackPanel>
                             </ui:Card>
 

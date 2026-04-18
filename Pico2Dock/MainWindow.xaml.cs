@@ -269,7 +269,7 @@ namespace Pico2Dock
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
-                bool isDockMode = (bool)SwitchHideDock.IsChecked;
+                bool isHideDock = (bool)SwitchHideDock.IsChecked;
                 bool isRePackage = (bool)CheckBoxPackname.IsChecked;
                 bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
                 string namePrefix = AppNamePrefix.Text;
@@ -285,7 +285,7 @@ namespace Pico2Dock
                     {
                         XElement metaData = new("meta-data");
                         metaData.SetAttributeValue(android + "name", "pico.vr.position");
-                        metaData.SetAttributeValue(android + "value", isDockMode ? "near" : "near_dialog");
+                        metaData.SetAttributeValue(android + "value", isHideDock ? "near_dialog" : "near");
 
                         foreach (XElement activity in xmlRoot.Descendants("application").Elements("activity"))
                             activity.Add(metaData);
@@ -345,30 +345,33 @@ namespace Pico2Dock
                         }
 
                         // Change permission
-                        foreach (XElement permissions in xmlRoot.Descendants("permission"))
+                        if (true)
                         {
-                            string value = permissions.Attribute(android + "name").Value;
-                            if (isAdvMode)
-                                permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
-                            else
-                                permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
-                        }
-
-                        foreach (XElement permissions in xmlRoot.Descendants("uses-permission"))
-                        {
-                            string value = permissions.Attribute(android + "name").Value;
-                            if (isAdvMode)
-                                permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
-                            else
-                                permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
-                        }
-
-                        if (isAdvMode)
-                        {
-                            foreach (XElement permissions in xmlRoot.Descendants("activity-alias"))
+                            foreach (XElement permissions in xmlRoot.Descendants("permission"))
                             {
                                 string value = permissions.Attribute(android + "name").Value;
-                                permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                                if (isAdvMode)
+                                    permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                                else
+                                    permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                            }
+
+                            foreach (XElement permissions in xmlRoot.Descendants("uses-permission"))
+                            {
+                                string value = permissions.Attribute(android + "name").Value;
+                                if (isAdvMode)
+                                    permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                                else
+                                    permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                            }
+
+                            if (isAdvMode)
+                            {
+                                foreach (XElement permissions in xmlRoot.Descendants("activity-alias"))
+                                {
+                                    string value = permissions.Attribute(android + "name").Value;
+                                    permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
+                                }
                             }
                         }
                     }
