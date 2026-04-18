@@ -36,5 +36,32 @@ namespace Pico2Dock
             }
             return res.ToString();
         }
+
+        public static bool IsJavaInstalled()
+        {
+            Process java = new()
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+
+                    FileName = "java",
+                    Arguments = $"-version",
+                }
+            };
+
+            try
+            {
+                java.Start();
+                java.WaitForExit();
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }

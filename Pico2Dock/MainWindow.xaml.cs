@@ -145,13 +145,20 @@ namespace Pico2Dock
         #region Button
         private async void StartProcess(object sender, RoutedEventArgs e)
         {
-            if (_files.Count > 0)
+            if (Utils.IsJavaInstalled())
             {
-                ResetAppearance();
-                MainTask();
+                if (_files.Count > 0)
+                {
+                    ResetAppearance();
+                    MainTask();
+                }
+                else
+                    ChangeStateText("### ERROR\nThere is no file in process.");
             }
             else
-                ChangeStateText("### ERROR\nThere is no file in process.");
+            {
+                ChangeStateText($"### ERROR\nUnable to run **Java** on machine.\nPlease install [Java 17](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi) as recommended [here](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi).");
+            }
         }
 
         private void CancleProcess(object sender, RoutedEventArgs e)
