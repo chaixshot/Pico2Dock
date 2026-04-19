@@ -183,9 +183,9 @@ namespace Pico2Dock
                 _files.RemoveAt(DropBox.SelectedIndex);
         }
 
-        private void OpenOutput(object sender, RoutedEventArgs e)
+        private void OpenContent(object sender, RoutedEventArgs e)
         {
-            Utils.OpenExplorer("patched");
+            Utils.OpenExplorer("Pico2Dock.exe");
         }
 
         private void AppNamePrefix_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)

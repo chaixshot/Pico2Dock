@@ -304,9 +304,9 @@
                         <ui:Button
                             x:Name="OutputButton"
                             Margin="0,3,0,0"
-                            Click="OpenOutput"
-                            Content="Open patched folder"
-                            ToolTip="Open output folder in file explorer" />
+                            Click="OpenContent"
+                            Content="Open content folder"
+                            ToolTip="Open appication content folder in file explorer" />
                     </StackPanel>
                 </Grid>
             </ui:DynamicScrollViewer>
