@@ -223,6 +223,7 @@ namespace Pico2Dock
 
                 int index = _files.IndexOf(filePath);
                 string apkName = System.IO.Path.GetFileName(filePath);
+                string outputDir = Path.GetDirectoryName(filePath);
 
                 // Replace invalid characters with empty string
                 apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", string.Empty);
@@ -449,7 +450,7 @@ namespace Pico2Dock
 
                 await Task.Run(() =>
                 {
-                    errorMessage = Tasks.SignedTask(apkName);
+                    errorMessage = Tasks.SignedTask(apkName, outputDir);
                 });
 
                 if (IsCancleProcess)
@@ -475,27 +476,27 @@ namespace Pico2Dock
                 ChangeStateText($"### Current Status\nFinishing **{apkName}**...");
                 IncressProgressBar(_files.Count);
 
-                bool signedFile = File.Exists($"./patched/{apkName[..^4]}-aligned-signed.apk");
+                bool signedFile = File.Exists($"{outputDir}/{apkName[..^4]}-aligned-signed.apk");
                 if (signedFile)
                 {
-                    if (File.Exists($"./patched/{apkName[..^4]}-aligned-signed.apk.idsig"))
-                        File.Delete($"./patched/{apkName[..^4]}-aligned-signed.apk.idsig");
+                    if (File.Exists($"{outputDir}/{apkName[..^4]}-aligned-signed.apk.idsig"))
+                        File.Delete($"{outputDir}/{apkName[..^4]}-aligned-signed.apk.idsig");
 
-                    if (Directory.Exists("./patched") && File.Exists($"./patched/PICO_{apkName[..^4]}.apk"))
+                    if (Directory.Exists(outputDir) && File.Exists($"{outputDir}/PICO_{apkName[..^4]}.apk"))
                     {
                         int count = 1;
-                        while (File.Exists($"./patched/PICO_{apkName[..^4]}({count}).apk"))
+                        while (File.Exists($"{outputDir}/PICO_{apkName[..^4]}({count}).apk"))
                             count++;
                         File.Move(
-                            $"./patched/{apkName[..^4]}-aligned-signed.apk",
-                            $"./patched/PICO_{apkName[..^4]}({count}).apk"
+                            $"{outputDir}/{apkName[..^4]}-aligned-signed.apk",
+                            $"{outputDir}/PICO_{apkName[..^4]}({count}).apk"
                         );
                     }
                     else
                     {
                         File.Move(
-                            $"./patched/{apkName[..^4]}-aligned-signed.apk",
-                            $"./patched/PICO_{apkName[..^4]}.apk"
+                            $"{outputDir}/{apkName[..^4]}-aligned-signed.apk",
+                            $"{outputDir}/PICO_{apkName[..^4]}.apk"
                         );
                     }
                 }
@@ -549,7 +550,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in the **patched** folder by clicking the button below.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in the same folder as the original file. Double click file in the box above to open in File Explorer.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
