@@ -128,7 +128,18 @@ namespace Pico2Dock
         private void DropBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (DropBox.SelectedIndex > -1)
-                Utils.OpenExplorer(DropBox.SelectedValue.ToString().Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty).Replace("✖️ ", string.Empty));
+            {
+                string path = DropBox.SelectedValue.ToString();
+
+                if (path.Contains("✔️"))
+                {
+                    string outPath = Path.GetDirectoryName(path.Replace("✔️ ", string.Empty)) + "\\Pico";
+                    Utils.OpenExplorer(outPath);
+
+                }
+                else
+                    Utils.OpenExplorer(path.Replace("🛠️ ", string.Empty).Replace("✖️ ", string.Empty));
+            }
         }
 
         private void DropBox_UpdateText()
@@ -223,7 +234,7 @@ namespace Pico2Dock
 
                 int index = _files.IndexOf(filePath);
                 string apkName = System.IO.Path.GetFileName(filePath);
-                string outputDir = Path.GetDirectoryName(filePath);
+                string outputDir = Path.GetDirectoryName(filePath) + "/Pico";
 
                 // Replace invalid characters with empty string
                 apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", string.Empty);
@@ -550,7 +561,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in the same folder as the original file. Double click file in the box above to open in File Explorer.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file. Double click file in the box above to open in File Explorer.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
