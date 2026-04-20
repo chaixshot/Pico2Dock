@@ -586,9 +586,14 @@ namespace Pico2Dock
         {
             try
             {
-                foreach (FileInfo file in new DirectoryInfo("./singer").GetFiles())
+                DirectoryInfo singer = new("./singer");
+
+                if (singer.Exists)
                 {
-                    file.Delete();
+                    foreach (FileInfo file in new DirectoryInfo("./singer").GetFiles())
+                    {
+                        file.Delete();
+                    }
                 }
             }
             catch (Exception ex)
@@ -598,13 +603,18 @@ namespace Pico2Dock
 
             try
             {
-                foreach (FileInfo file in new DirectoryInfo("./worker").GetFiles())
+                DirectoryInfo worker = new("./worker");
+
+                if (worker.Exists)
                 {
-                    file.Delete();
-                }
-                foreach (string dir in Directory.GetDirectories("./worker"))
-                {
-                    Directory.Delete(dir, true);
+                    foreach (FileInfo file in worker.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (string dir in Directory.GetDirectories("./worker"))
+                    {
+                        Directory.Delete(dir, true);
+                    }
                 }
             }
             catch (Exception ex)
