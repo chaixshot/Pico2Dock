@@ -34,7 +34,7 @@ namespace Pico2Dock
             VersionText.Text = $"Version {Utils.GetAppVersion()}";
 
             ResetAppearance();
-            ControlButton(1);
+            ChangeButtonState();
 
             DropBox.SizeChanged += DropBoxChangeDeleteButton;
             DropBox.SelectionChanged += DropBoxChangeDeleteButton;
@@ -42,7 +42,8 @@ namespace Pico2Dock
         }
 
         #region Parameter
-        private bool IsCancelProcess = false;
+        private bool IsProcessCancel = false;
+        private bool IsProcessRunning = false;
         private ObservableCollection<string> _files = [];
         public ObservableCollection<string> Files
         {
@@ -68,7 +69,7 @@ namespace Pico2Dock
 
         private void DropBox_Drop(object sender, DragEventArgs e)
         {
-            if (StartButton.IsEnabled)
+            if (!IsProcessRunning)
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -149,7 +150,7 @@ namespace Pico2Dock
             else
                 DropBoxButton.Visibility = Visibility.Visible;
 
-            ControlButton(1);
+            ChangeButtonState();
         }
         #endregion
 
@@ -158,23 +159,19 @@ namespace Pico2Dock
         {
             if (Utils.IsJavaInstalled())
             {
-                if (_files.Count > 0)
+                ResetAppearance();
+
+                // Remove file indicator except error
+                foreach (string filePath in Files.ToList())
                 {
-                    ResetAppearance();
-                    ControlButton(2);
+                    int index = Files.IndexOf(filePath);
 
-                    // Remove file indicator except error
-                    foreach (string filePath in Files.ToList())
-                    {
-                        int index = Files.IndexOf(filePath);
-
-                        Files[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
-                    }
-
-                    MainTask(Files);
+                    Files[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
                 }
-                else
-                    ChangeStateText("### ERROR\nThere is no file in process.");
+
+                IsProcessRunning = true;
+                MainTask(Files);
+                ChangeButtonState();
             }
             else
             {
@@ -184,12 +181,12 @@ namespace Pico2Dock
 
         private void CancelProcess(object sender, RoutedEventArgs e)
         {
-            if (!IsCancelProcess)
+            if (!IsProcessCancel)
             {
                 ChangeStateText($"### Current Status\nCanceling process please wait...");
 
-                CancelButton.IsEnabled = false;
-                IsCancelProcess = true;
+                IsProcessCancel = true;
+                ChangeButtonState();
                 Tasks.KillTasks();
             }
         }
@@ -203,7 +200,7 @@ namespace Pico2Dock
 
         private void RemoveFiles(object sender, RoutedEventArgs e)
         {
-            if (DropBox.SelectedIndex > -1 && StartButton.IsEnabled)
+            if (DropBox.SelectedIndex > -1 && !IsProcessRunning)
                 _files.RemoveAt(DropBox.SelectedIndex);
         }
 
@@ -267,7 +264,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.DecompilerTask(filePath);
                 });
 
-                if (IsCancelProcess)
+                if (IsProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -435,7 +432,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.CompilerTask(apkName);
                 });
 
-                if (IsCancelProcess)
+                if (IsProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -453,7 +450,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.SignedTask(apkName, outputDir);
                 });
 
-                if (IsCancelProcess)
+                if (IsProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -528,7 +525,7 @@ namespace Pico2Dock
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(DirectoryCleanup);
 
-            if (IsCancelProcess)
+            if (IsProcessCancel)
             { // Terminate
                 PercentText.Text = "Terminated";
 
@@ -553,26 +550,27 @@ namespace Pico2Dock
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
 
-            ControlButton(1);
             StatusProgressBar.Value = 100;
+            IsProcessRunning = false;
+
+            ChangeButtonState();
 
             // Play sound
             simpleSound.Play();
         }
 
         #region Utils
-        private void ControlButton(int state)
+        private void ChangeButtonState()
         {
-            if (state == 1)
-            {
+            if (_files.Count > 0 && !IsProcessRunning)
                 StartButton.IsEnabled = true;
-                CancelButton.IsEnabled = false;
-            }
-            if (state == 2)
-            {
+            else
                 StartButton.IsEnabled = false;
+
+            if (!IsProcessCancel && IsProcessRunning)
                 CancelButton.IsEnabled = true;
-            }
+            else
+                CancelButton.IsEnabled = false;
 
             if (_files.Count > 0 && !CancelButton.IsEnabled)
                 ClearButton.IsEnabled = true;
@@ -624,7 +622,7 @@ namespace Pico2Dock
         private void ResetAppearance()
         {
             ChangeStateText(string.Empty);
-            IsCancelProcess = false;
+            IsProcessCancel = false;
             PercentText.Text = string.Empty;
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;
@@ -632,7 +630,7 @@ namespace Pico2Dock
 
         private void DropBoxChangeDeleteButton(object sender, dynamic e)
         {
-            if (StartButton.IsEnabled && DropBox.SelectedIndex != -1)
+            if (!IsProcessRunning && DropBox.SelectedIndex != -1)
                 RemoveButton.IsEnabled = true;
             else
                 RemoveButton.IsEnabled = false;

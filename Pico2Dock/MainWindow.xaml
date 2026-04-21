@@ -152,6 +152,7 @@
                             Margin="0,5,5,0"
                             Click="StartProcess"
                             Content="Start"
+                            IsEnabled="False"
                             ToolTip="Start convert process" />
 
                         <ui:Button
@@ -169,6 +170,7 @@
                             Margin="0,5,5,0"
                             Click="ClearFiles"
                             Content="Clear"
+                            IsEnabled="False"
                             ToolTip="Clear all files" />
 
                         <ui:Button
