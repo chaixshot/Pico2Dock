@@ -42,7 +42,7 @@ namespace Pico2Dock
         }
 
         #region Parameter
-        private bool IsCancleProcess = false;
+        private bool IsCancelProcess = false;
         private ObservableCollection<string> _files = [];
         public ObservableCollection<string> Files
         {
@@ -182,12 +182,14 @@ namespace Pico2Dock
             }
         }
 
-        private void CancleProcess(object sender, RoutedEventArgs e)
+        private void CancelProcess(object sender, RoutedEventArgs e)
         {
-            if (!IsCancleProcess)
+            if (!IsCancelProcess)
             {
-                CancleButton.IsEnabled = false;
-                IsCancleProcess = true;
+                ChangeStateText($"### Current Status\nCanceling process please wait...");
+
+                CancelButton.IsEnabled = false;
+                IsCancelProcess = true;
                 Tasks.KillTasks();
             }
         }
@@ -265,7 +267,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.DecompilerTask(filePath);
                 });
 
-                if (IsCancleProcess)
+                if (IsCancelProcess)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -433,7 +435,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.CompilerTask(apkName);
                 });
 
-                if (IsCancleProcess)
+                if (IsCancelProcess)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -451,7 +453,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.SignedTask(apkName, outputDir);
                 });
 
-                if (IsCancleProcess)
+                if (IsCancelProcess)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -526,11 +528,11 @@ namespace Pico2Dock
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(DirectoryCleanup);
 
-            if (IsCancleProcess)
+            if (IsCancelProcess)
             { // Terminate
                 PercentText.Text = "Terminated";
 
-                ChangeStateText("### Process has been terminated.");
+                ChangeStateText("### Current Status\nProcess has been terminated.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
                 simpleSound = new(@"c:\Windows\Media\Windows Hardware Fail.wav");
             }
@@ -564,15 +566,15 @@ namespace Pico2Dock
             if (state == 1)
             {
                 StartButton.IsEnabled = true;
-                CancleButton.IsEnabled = false;
+                CancelButton.IsEnabled = false;
             }
             if (state == 2)
             {
                 StartButton.IsEnabled = false;
-                CancleButton.IsEnabled = true;
+                CancelButton.IsEnabled = true;
             }
 
-            if (_files.Count > 0 && !CancleButton.IsEnabled)
+            if (_files.Count > 0 && !CancelButton.IsEnabled)
                 ClearButton.IsEnabled = true;
             else
                 ClearButton.IsEnabled = false;
@@ -622,7 +624,7 @@ namespace Pico2Dock
         private void ResetAppearance()
         {
             ChangeStateText(string.Empty);
-            IsCancleProcess = false;
+            IsCancelProcess = false;
             PercentText.Text = string.Empty;
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;

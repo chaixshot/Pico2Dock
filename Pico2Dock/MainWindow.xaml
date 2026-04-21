@@ -155,11 +155,11 @@
                             ToolTip="Start convert process" />
 
                         <ui:Button
-                            x:Name="CancleButton"
+                            x:Name="CancelButton"
                             Width="75"
                             Margin="0,5,5,0"
-                            Click="CancleProcess"
-                            Content="Cancle"
+                            Click="CancelProcess"
+                            Content="Cancel"
                             IsEnabled="False"
                             ToolTip="Terminate processing task" />
 
