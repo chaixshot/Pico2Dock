@@ -36,7 +36,7 @@ namespace Pico2Dock
             }
 
             if (decompiler.ExitCode != 0)
-                return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {decompiler.ExitCode}\n```{decompiler.StandardError.ReadToEnd()}```";
+                return $"**File:** {apkName}\n**Exit Code:** {decompiler.ExitCode}\n```{decompiler.StandardError.ReadToEnd()}```";
             else
                 return string.Empty;
         }
@@ -67,7 +67,7 @@ namespace Pico2Dock
             }
 
             if (compiler.ExitCode != 0)
-                return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {compiler.ExitCode}\n```{compiler.StandardError.ReadToEnd()}```";
+                return $"**File:** {apkName}\n**Exit Code:** {compiler.ExitCode}\n```{compiler.StandardError.ReadToEnd()}```";
             else
                 return string.Empty;
         }
@@ -86,7 +86,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/uber-apk-signer-1.3.0.jar\" -a \"./singer/{apkName}\" --ks \"src/keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir}\"",
+                    Arguments = $"-jar \"src/uber-apk-signer-1.3.0.jar\" --apks \"./singer/{apkName}\" --ks \"src/keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir}\"",
                 }
             };
             signer.Start();
@@ -98,7 +98,7 @@ namespace Pico2Dock
             }
 
             if (signer.ExitCode != 0)
-                return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {signer.ExitCode}\n```{signer.StandardError.ReadToEnd()}```";
+                return $"**File:** {apkName}\n**Exit Code:** {signer.ExitCode}\n```{signer.StandardError.ReadToEnd()}```";
             else
                 return string.Empty;
         }

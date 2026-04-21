@@ -176,6 +176,7 @@ namespace Pico2Dock
         {
             if (!IsCancleProcess)
             {
+                CancleButton.IsEnabled = false;
                 IsCancleProcess = true;
                 Tasks.KillTasks();
             }
@@ -264,17 +265,7 @@ namespace Pico2Dock
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
                     IncressProgressBar(_files.Count, 5);
-                    _files.RemoveAt(index);
-                    if (_files.Count > 1)
-                    {
-                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        continue;
-                    }
-                    else
-                    {
-                        _files.Insert(index, "✖️ " + filePath);
-                        goto skipMainTask;
-                    }
+                    goto skipFile;
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
@@ -442,17 +433,7 @@ namespace Pico2Dock
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
                     IncressProgressBar(_files.Count, 3);
-                    _files.RemoveAt(index);
-                    if (_files.Count > 1)
-                    {
-                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        continue;
-                    }
-                    else
-                    {
-                        _files.Insert(index, "✖️ " + filePath);
-                        goto skipMainTask;
-                    }
+                    goto skipFile;
                 }
 
                 //?? -------------------- [[ Start uber apk signer ]] --------------------
@@ -470,17 +451,7 @@ namespace Pico2Dock
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
                     IncressProgressBar(_files.Count, 2);
-                    _files.RemoveAt(index);
-                    if (_files.Count > 1)
-                    {
-                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        continue;
-                    }
-                    else
-                    {
-                        _files.Insert(index, "✖️ " + filePath);
-                        goto skipMainTask;
-                    }
+                    goto skipFile;
                 }
 
                 //?? -------------------- [[ Rename ]] --------------------
@@ -513,20 +484,10 @@ namespace Pico2Dock
                 }
                 else
                 {
-                    errorMessage = $"### ERROR\nUnable to compile file {apkName}";
+                    errorMessage = $"Unable to compile file {apkName}";
 
                     IncressProgressBar(_files.Count, 1);
-                    _files.RemoveAt(index);
-                    if (_files.Count > 1)
-                    {
-                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
-                        continue;
-                    }
-                    else
-                    {
-                        _files.Insert(index, "✖️ " + filePath);
-                        goto skipMainTask;
-                    }
+                    goto skipFile;
                 }
 
                 ChangeStateText($"### Current Status\nCleaning directory...");
@@ -536,6 +497,22 @@ namespace Pico2Dock
                 IncressProgressBar(_files.Count);
                 _files.RemoveAt(index);
                 _files.Insert(index, "✔️ " + filePath);
+
+            skipFile:
+
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    _files.RemoveAt(index);
+                    if (_files.Count > 1)
+                    {
+                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
+                    }
+                    else
+                    {
+                        _files.Insert(index, "✖️ " + filePath);
+                        goto skipMainTask;
+                    }
+                }
             }
 
             //?? After task
@@ -557,7 +534,7 @@ namespace Pico2Dock
             { // Error
                 PercentText.Text = "Error";
 
-                ChangeStateText(errorMessage);
+                ChangeStateText($"### ERROR\n{errorMessage}");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
                 simpleSound = new(@"c:\Windows\Media\Windows Error.wav");
             }
