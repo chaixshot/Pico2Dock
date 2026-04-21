@@ -444,7 +444,7 @@ namespace Pico2Dock
                     goto skipFile;
                 }
 
-                //?? -------------------- [[ Start uber apk signer ]] --------------------
+                //?? -------------------- [[ Start signing apk ]] --------------------
                 ChangeStateText($"### Current Status\nSigning **{apkName}**...");
                 IncressProgressBar(apkFile.Count);
 
