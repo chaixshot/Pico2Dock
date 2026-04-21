@@ -34,278 +34,273 @@
                 </ui:TitleBar.Header>
             </ui:TitleBar>
 
-            <ui:DynamicScrollViewer
-                Grid.Row="1"
-                Margin="10,20,10,20"
-                Padding="15,0,15,0"
-                CanContentScroll="True"
-                IsScrollingVertically="True">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+            <Grid Grid.Row="1" Margin="40,30,40,30">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
 
-                    <ui:Card>
-                        <ui:Card.Background>
-                            <ImageBrush
-                                ImageSource="/src/banner.jpg"
-                                RenderOptions.BitmapScalingMode="HighQuality"
-                                Stretch="UniformToFill" />
-                        </ui:Card.Background>
-                        <StackPanel Grid.Row="0">
-                            <StackPanel Orientation="Horizontal">
-                                <ui:ImageIcon
-                                    Height="30"
-                                    Margin="0,3,10,0"
-                                    HorizontalAlignment="Center"
-                                    VerticalAlignment="Center"
-                                    Source="/src/icon.ico" />
-                                <ui:TextBlock
-                                    FontTypography="Title"
-                                    Foreground="White"
-                                    Text="Pico2Dock"
-                                    TextWrapping="Wrap" />
-                                <ui:TextBlock
-                                    x:Name="VersionText"
-                                    Margin="20,15,0,0"
-                                    FontTypography="BodyStrong"
-                                    Foreground="White"
-                                    Text="Version"
-                                    TextWrapping="Wrap" />
-                            </StackPanel>
+                <ui:Card VerticalAlignment="Top">
+                    <ui:Card.Background>
+                        <ImageBrush
+                            ImageSource="/src/banner.jpg"
+                            RenderOptions.BitmapScalingMode="HighQuality"
+                            Stretch="UniformToFill" />
+                    </ui:Card.Background>
+                    <StackPanel Grid.Row="0">
+                        <StackPanel Orientation="Horizontal">
+                            <ui:ImageIcon
+                                Height="30"
+                                Margin="0,3,10,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Source="/src/icon.ico" />
                             <ui:TextBlock
-                                FontTypography="Subtitle"
+                                FontTypography="Title"
                                 Foreground="White"
-                                Text="Convert the APK app from Floating to Dashboard Dock for Pico 4, alike File Manager."
+                                Text="Pico2Dock"
                                 TextWrapping="Wrap" />
                             <ui:TextBlock
+                                x:Name="VersionText"
+                                Margin="20,15,0,0"
                                 FontTypography="BodyStrong"
                                 Foreground="White"
-                                Text="Allow to multitasking while in fullscreen immersive app."
+                                Text="Version"
                                 TextWrapping="Wrap" />
-
-                            <StackPanel
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Orientation="Horizontal">
-
-                                <ui:TextBlock
-                                    Margin="6"
-                                    FontTypography="Caption"
-                                    Foreground="White"
-                                    Text="Made by H@mer" />
-                                <ui:HyperlinkButton
-                                    Content="Github Page"
-                                    Foreground="NavajoWhite"
-                                    Icon="{ui:SymbolIcon Symbol=Globe24,
-                                                         Filled=False}"
-                                    NavigateUri="https://github.com/chaixshot/Pico2Dock" />
-                            </StackPanel>
                         </StackPanel>
-                    </ui:Card>
+                        <ui:TextBlock
+                            FontTypography="Subtitle"
+                            Foreground="White"
+                            Text="Convert the APK app from Floating to Dashboard Dock for Pico 4, alike File Manager."
+                            TextWrapping="Wrap" />
+                        <ui:TextBlock
+                            FontTypography="BodyStrong"
+                            Foreground="White"
+                            Text="Allow to multitasking while in fullscreen immersive app."
+                            TextWrapping="Wrap" />
 
-                    <ui:Card
-                        Grid.Row="1"
-                        Margin="0,10,0,0"
-                        Padding="5">
-                        <Grid>
-                            <ui:ListView
-                                Name="DropBox"
-                                Height="200"
-                                AllowDrop="True"
-                                DragLeave="DropBox_DragLeave"
-                                DragOver="DropBox_DragOver"
-                                Drop="DropBox_Drop"
-                                ItemsSource="{Binding Path=Files}"
-                                KeyUp="DropBox_KeyUp"
-                                MouseDoubleClick="DropBox_MouseDoubleClick"
-                                ScrollViewer.CanContentScroll="True"
-                                ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto" />
-                            <ui:Button
-                                x:Name="DropBoxButton"
-                                Width="{Binding ActualWidth, ElementName=DropBox, Mode=OneWay}"
-                                Height="{Binding ActualHeight, ElementName=DropBox, Mode=OneWay}"
-                                Padding="0"
-                                AllowDrop="True"
-                                Background="Transparent"
-                                BorderBrush="{x:Null}"
-                                Click="DropBox_Click"
-                                Content="Drag and drop APK file here, or click here to choose a file"
-                                Cursor="Hand"
-                                DragLeave="DropBox_DragLeave"
-                                DragOver="DropBox_DragOver"
-                                Drop="DropBox_Drop"
-                                FontWeight="Bold"
-                                Opacity="0.4"
-                                ToolTip="Click or drop file here" />
-                        </Grid>
-                    </ui:Card>
+                        <StackPanel
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Orientation="Horizontal">
 
-                    <Grid Grid.Row="2">
+                            <ui:TextBlock
+                                Margin="6"
+                                FontTypography="Caption"
+                                Foreground="White"
+                                Text="Made by H@mer" />
+                            <ui:HyperlinkButton
+                                Content="Github Page"
+                                Foreground="NavajoWhite"
+                                Icon="{ui:SymbolIcon Symbol=Globe24,
+                                                     Filled=False}"
+                                NavigateUri="https://github.com/chaixshot/Pico2Dock" />
+                        </StackPanel>
+                    </StackPanel>
+                </ui:Card>
+
+                <ui:Card
+                    x:Name="card"
+                    Grid.Row="1"
+                    Margin="0,10,0,0"
+                    Padding="5"
+                    VerticalAlignment="Stretch">
+                    <Grid>
+                        <ui:ListView
+                            Name="DropBox"
+                            AllowDrop="True"
+                            DragLeave="DropBox_DragLeave"
+                            DragOver="DropBox_DragOver"
+                            Drop="DropBox_Drop"
+                            ItemsSource="{Binding Path=Files}"
+                            KeyUp="DropBox_KeyUp"
+                            MouseDoubleClick="DropBox_MouseDoubleClick" />
+                        <ui:Button
+                            x:Name="DropBoxButton"
+                            Height="{Binding ActualHeight, ElementName=card, Mode=OneWay}"
+                            Padding="0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            AllowDrop="True"
+                            Background="Transparent"
+                            BorderBrush="{x:Null}"
+                            Click="DropBox_Click"
+                            Content="Drag and drop APK file here, or click here to choose a file"
+                            Cursor="Hand"
+                            DragLeave="DropBox_DragLeave"
+                            DragOver="DropBox_DragOver"
+                            Drop="DropBox_Drop"
+                            FontWeight="Bold"
+                            Opacity="0.4"
+                            ToolTip="Click or drop file here" />
+                    </Grid>
+                </ui:Card>
+
+                <Grid Grid.Row="2" VerticalAlignment="Top">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <WrapPanel VerticalAlignment="Top" Orientation="Horizontal">
+                        <ui:Button
+                            x:Name="StartButton"
+                            Width="75"
+                            Margin="0,5,5,0"
+                            Click="StartProcess"
+                            Content="Start"
+                            ToolTip="Start convert process" />
+
+                        <ui:Button
+                            x:Name="CancleButton"
+                            Width="75"
+                            Margin="0,5,5,0"
+                            Click="CancleProcess"
+                            Content="Cancle"
+                            IsEnabled="False"
+                            ToolTip="Terminate processing task" />
+
+                        <ui:Button
+                            x:Name="ClearButton"
+                            Width="75"
+                            Margin="0,5,5,0"
+                            Click="ClearFiles"
+                            Content="Clear"
+                            ToolTip="Clear all files" />
+
+                        <ui:Button
+                            x:Name="RemoveButton"
+                            Width="75"
+                            Margin="0,5,5,0"
+                            Click="RemoveFiles"
+                            Content="Remove"
+                            ToolTip="Remove current select file" />
+                    </WrapPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Orientation="Horizontal">
+
+                        <ui:Card
+                            Margin="0,5,5,0"
+                            Padding="10"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top">
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                <ui:ToggleSwitch x:Name="SwitchHideDock" ToolTip="Put the app on to of everything incluing dock and keyboard" />
+                                <ui:TextBlock
+                                    Margin="5,0,0,0"
+                                    Text="Hide Dock"
+                                    ToolTip="{Binding ToolTip, ElementName=SwitchHideDock}" />
+                            </StackPanel>
+                        </ui:Card>
+
+                        <ui:Card
+                            Margin="0,5,5,0"
+                            Padding="7"
+                            VerticalAlignment="Top">
+                            <StackPanel>
+                                <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                    <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
+                                    <ui:TextBlock
+                                        Padding="0,5,0,0"
+                                        FontSize="16"
+                                        Text="New package name"
+                                        ToolTip="{Binding ToolTip, ElementName=CheckBoxPackname}" />
+                                </StackPanel>
+
+                                <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                    <CheckBox
+                                        x:Name="CheckBoxPackAdv"
+                                        IsEnabled="{Binding IsChecked, ElementName=CheckBoxPackname}"
+                                        ToolTip="Rename the package name in advanced mode if normal is not working." />
+                                    <ui:TextBlock
+                                        Padding="0,5,0,0"
+                                        FontSize="16"
+                                        Text="Advanced mode"
+                                        ToolTip="{Binding ToolTip, ElementName=CheckBoxPackAdv}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </ui:Card>
+
+                        <ui:Card Margin="0,5,5,0" Padding="7">
+                            <StackPanel>
+                                <ui:TextBox
+                                    x:Name="AppNamePrefix"
+                                    MinWidth="150"
+                                    MaxWidth="150"
+                                    VerticalAlignment="Top"
+                                    MaxLength="15"
+                                    PlaceholderText="After app name"
+                                    TextChanged="AppNamePrefix_TextChanged"
+                                    ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
+
+                                <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
+                                    <CheckBox
+                                        x:Name="CheckBoxRename"
+                                        IsEnabled="False"
+                                        ToolTip="Change the entire app name instead of adding text after." />
+                                    <ui:TextBlock
+                                        Padding="0,5,0,0"
+                                        FontSize="16"
+                                        Text="Rename"
+                                        ToolTip="{Binding ToolTip, ElementName=CheckBoxRename}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </ui:Card>
+                    </StackPanel>
+                </Grid>
+
+                <StackPanel
+                    Grid.Row="3"
+                    Margin="0,30,0,0"
+                    VerticalAlignment="Top">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-
-                        <WrapPanel VerticalAlignment="Top" Orientation="Horizontal">
-                            <ui:Button
-                                x:Name="StartButton"
-                                Width="75"
-                                Margin="0,5,5,0"
-                                Click="StartProcess"
-                                Content="Start"
-                                ToolTip="Start convert process" />
-
-                            <ui:Button
-                                x:Name="CancleButton"
-                                Width="75"
-                                Margin="0,5,5,0"
-                                Click="CancleProcess"
-                                Content="Cancle"
-                                IsEnabled="False"
-                                ToolTip="Terminate processing task" />
-
-                            <ui:Button
-                                x:Name="ClearButton"
-                                Width="75"
-                                Margin="0,5,5,0"
-                                Click="ClearFiles"
-                                Content="Clear"
-                                ToolTip="Clear all files" />
-
-                            <ui:Button
-                                x:Name="RemoveButton"
-                                Width="75"
-                                Margin="0,5,5,0"
-                                Click="RemoveFiles"
-                                Content="Remove"
-                                ToolTip="Remove current select file" />
-                        </WrapPanel>
-
-                        <StackPanel
-                            Grid.Column="1"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Top"
-                            Orientation="Horizontal">
-
-                            <ui:Card
-                                Margin="0,5,5,0"
-                                Padding="10"
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Top">
-                                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                    <ui:ToggleSwitch x:Name="SwitchHideDock" ToolTip="Put the app on to of everything incluing dock and keyboard" />
-                                    <ui:TextBlock
-                                        Margin="5,0,0,0"
-                                        Text="Hide Dock"
-                                        ToolTip="{Binding ToolTip, ElementName=SwitchHideDock}" />
-                                </StackPanel>
-                            </ui:Card>
-
-                            <ui:Card
-                                Margin="0,5,5,0"
-                                Padding="7"
-                                VerticalAlignment="Top">
-                                <StackPanel>
-                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                        <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version. &#x0a;&#x0a;Package is more likey not to work, depending the app is writtcn and its protection." />
-                                        <ui:TextBlock
-                                            Padding="0,5,0,0"
-                                            FontSize="16"
-                                            Text="New package name"
-                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxPackname}" />
-                                    </StackPanel>
-
-                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                        <CheckBox
-                                            x:Name="CheckBoxPackAdv"
-                                            IsEnabled="{Binding IsChecked, ElementName=CheckBoxPackname}"
-                                            ToolTip="Rename the package name in advanced mode if normal is not working." />
-                                        <ui:TextBlock
-                                            Padding="0,5,0,0"
-                                            FontSize="16"
-                                            Text="Advanced mode"
-                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxPackAdv}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </ui:Card>
-
-                            <ui:Card Margin="0,5,5,0" Padding="7">
-                                <StackPanel>
-                                    <ui:TextBox
-                                        x:Name="AppNamePrefix"
-                                        MinWidth="150"
-                                        MaxWidth="150"
-                                        VerticalAlignment="Top"
-                                        MaxLength="15"
-                                        PlaceholderText="After app name"
-                                        TextChanged="AppNamePrefix_TextChanged"
-                                        ToolTip="Add text to the end of the original app name. &#x0a;&#x0a;Leave it black to do nothing. &#x0a;&#x0a;Not working for an app that can change its name through its settings." />
-
-                                    <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                        <CheckBox
-                                            x:Name="CheckBoxRename"
-                                            IsEnabled="False"
-                                            ToolTip="Change the entire app name instead of adding text after." />
-                                        <ui:TextBlock
-                                            Padding="0,5,0,0"
-                                            FontSize="16"
-                                            Text="Rename"
-                                            ToolTip="{Binding ToolTip, ElementName=CheckBoxRename}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </ui:Card>
-                        </StackPanel>
+                        <ProgressBar
+                            x:Name="StatusProgressBar"
+                            Height="22"
+                            Value="40" />
+                        <ui:TextBlock
+                            x:Name="PercentText"
+                            Margin="10,1,0,0"
+                            HorizontalAlignment="Center"
+                            FontWeight="Bold"
+                            Foreground="White"
+                            Opacity="0.7" />
                     </Grid>
 
-                    <StackPanel Grid.Row="3" Margin="0,30,0,0">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <ProgressBar
-                                x:Name="StatusProgressBar"
-                                Height="22"
-                                Value="40" />
-                            <ui:TextBlock
-                                x:Name="PercentText"
-                                Margin="10,1,0,0"
-                                HorizontalAlignment="Center"
-                                FontWeight="Bold"
-                                Foreground="White"
-                                Opacity="0.7" />
-                        </Grid>
+                    <ui:Card Padding="0">
+                        <markd:MarkdownViewer
+                            x:Name="StatusText"
+                            Height="200"
+                            HorizontalContentAlignment="Left"
+                            EnableStreaming="False"
+                            EnableSyntaxHighlighting="True"
+                            FontFamily="Segoe UI"
+                            FontSize="14"
+                            ScrollViewer.CanContentScroll="True"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            UseTransparentCanvas="True" />
+                    </ui:Card>
 
-                        <ui:Card Padding="0">
-                            <markd:MarkdownViewer
-                                x:Name="StatusText"
-                                Height="200"
-                                HorizontalContentAlignment="Left"
-                                EnableStreaming="False"
-                                EnableSyntaxHighlighting="True"
-                                FontFamily="Segoe UI"
-                                FontSize="14"
-                                ScrollViewer.CanContentScroll="True"
-                                ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                UseTransparentCanvas="True" />
-                        </ui:Card>
-
-                        <ui:Button
-                            x:Name="OutputButton"
-                            Margin="0,3,0,0"
-                            Click="OpenContent"
-                            Content="Open content folder"
-                            ToolTip="Open appication content folder in file explorer" />
-                    </StackPanel>
-                </Grid>
-            </ui:DynamicScrollViewer>
+                    <ui:Button
+                        x:Name="OutputButton"
+                        Margin="0,3,0,0"
+                        Click="OpenContent"
+                        Content="Open content folder"
+                        ToolTip="Open appication content folder in file explorer" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </ui:FluentWindow>
