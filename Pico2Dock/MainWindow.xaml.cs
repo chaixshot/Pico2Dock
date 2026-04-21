@@ -227,11 +227,11 @@ namespace Pico2Dock
                 _files.Insert(index, filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty));
             }
 
+            ChangeStateText($"### Current Status\nCleaning directory...");
+            await Task.Run(DirectoryCleanup);
+
             foreach (string filePath in _files.ToList())
             {
-                ChangeStateText($"### Current Status\nCleaning directory...");
-                await Task.Run(DirectoryCleanup);
-
                 int index = _files.IndexOf(filePath);
                 string apkName = System.IO.Path.GetFileName(filePath);
                 string outputDir = Path.GetDirectoryName(filePath) + "/Pico";
@@ -529,6 +529,9 @@ namespace Pico2Dock
                     }
                 }
 
+                ChangeStateText($"### Current Status\nCleaning directory...");
+                await Task.Run(DirectoryCleanup);
+
                 //?? -------------------- [[ File indicator ]] --------------------
                 IncressProgressBar(_files.Count);
                 _files.RemoveAt(index);
@@ -539,13 +542,14 @@ namespace Pico2Dock
         skipMainTask:
             SoundPlayer simpleSound;
 
+            ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(DirectoryCleanup);
 
             if (IsCancleProcess)
             { // Terminate
                 PercentText.Text = "Terminated";
 
-                ChangeStateText("Process has been terminated.");
+                ChangeStateText("### Process has been terminated.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
                 simpleSound = new(@"c:\Windows\Media\Windows Hardware Fail.wav");
             }
