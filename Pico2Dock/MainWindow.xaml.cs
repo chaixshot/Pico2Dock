@@ -236,12 +236,20 @@ namespace Pico2Dock
                 string apkName = Path.GetFileName(filePath);
                 string outputDir = Path.GetDirectoryName(filePath) + "/Pico";
 
+
                 // Replace invalid characters with empty string
                 apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", string.Empty);
 
                 // skip is file error from previous task
                 if (filePath.Contains("✖️"))
                     continue;
+
+                if (!File.Exists(filePath))
+                {
+                    errorMessage = $"File **{filePath}** does not exist";
+                    continue;
+                }
+
 
                 //?? -------------------- [[ File indicator ]] --------------------
                 apkFile[index] = "🛠️ " + filePath;
