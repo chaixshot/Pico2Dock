@@ -161,7 +161,17 @@ namespace Pico2Dock
                 if (_files.Count > 0)
                 {
                     ResetAppearance();
-                    MainTask();
+                    ControlButton(2);
+
+                    // Remove file indicator except error
+                    foreach (string filePath in Files.ToList())
+                    {
+                        int index = Files.IndexOf(filePath);
+
+                        Files[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
+                    }
+
+                    MainTask(Files);
                 }
                 else
                     ChangeStateText("### ERROR\nThere is no file in process.");
@@ -213,26 +223,16 @@ namespace Pico2Dock
             PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
         }
 
-        private async void MainTask()
+        private async void MainTask(ObservableCollection<string> apkFile)
         {
-            ControlButton(2);
-
             string errorMessage = string.Empty;
-
-            // Remove file indicator except error
-            foreach (string filePath in _files.ToList())
-            {
-                int index = _files.IndexOf(filePath);
-
-                _files[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
-            }
 
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(DirectoryCleanup);
 
-            foreach (string filePath in _files.ToList())
+            foreach (string filePath in apkFile.ToList())
             {
-                int index = _files.IndexOf(filePath);
+                int index = apkFile.IndexOf(filePath);
                 string apkName = Path.GetFileName(filePath);
                 string outputDir = Path.GetDirectoryName(filePath) + "/Pico";
 
@@ -244,13 +244,13 @@ namespace Pico2Dock
                     continue;
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                _files[index] = "🛠️ " + filePath;
+                apkFile[index] = "🛠️ " + filePath;
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nDecompiling **{apkName}**...");
-                IncressProgressBar(_files.Count);
+                IncressProgressBar(apkFile.Count);
 
                 await Task.Run(() =>
                 {
@@ -262,13 +262,13 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(_files.Count, 5);
+                    IncressProgressBar(apkFile.Count, 5);
                     goto skipFile;
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
-                IncressProgressBar(_files.Count);
+                IncressProgressBar(apkFile.Count);
 
                 bool isHideDock = (bool)SwitchHideDock.IsChecked;
                 bool isRePackage = (bool)CheckBoxPackname.IsChecked;
@@ -418,7 +418,7 @@ namespace Pico2Dock
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nCompiling **{apkName}**...");
-                IncressProgressBar(_files.Count);
+                IncressProgressBar(apkFile.Count);
 
                 await Task.Run(() =>
                 {
@@ -430,13 +430,13 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(_files.Count, 3);
+                    IncressProgressBar(apkFile.Count, 3);
                     goto skipFile;
                 }
 
                 //?? -------------------- [[ Start uber apk signer ]] --------------------
                 ChangeStateText($"### Current Status\nSigning **{apkName}**...");
-                IncressProgressBar(_files.Count);
+                IncressProgressBar(apkFile.Count);
 
                 await Task.Run(() =>
                 {
@@ -448,13 +448,13 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(_files.Count, 2);
+                    IncressProgressBar(apkFile.Count, 2);
                     goto skipFile;
                 }
 
                 //?? -------------------- [[ Rename ]] --------------------
                 ChangeStateText($"### Current Status\nFinishing **{apkName}**...");
-                IncressProgressBar(_files.Count);
+                IncressProgressBar(apkFile.Count);
 
                 bool signedFile = File.Exists($"{outputDir}/{apkName[..^4]}-aligned-signed.apk");
                 if (signedFile)
@@ -484,7 +484,7 @@ namespace Pico2Dock
                 {
                     errorMessage = $"Unable to compile file {apkName}";
 
-                    IncressProgressBar(_files.Count, 1);
+                    IncressProgressBar(apkFile.Count, 1);
                     goto skipFile;
                 }
 
@@ -492,20 +492,20 @@ namespace Pico2Dock
                 await Task.Run(DirectoryCleanup);
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                IncressProgressBar(_files.Count);
-                _files[index] = "✔️ " + filePath;
+                IncressProgressBar(apkFile.Count);
+                apkFile[index] = "✔️ " + filePath;
 
             skipFile:
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    if (_files.Count > 1)
+                    if (apkFile.Count > 1)
                     {
-                        _files[index] = "✖️ " + filePath + " 🔘 " + errorMessage;
+                        apkFile[index] = "✖️ " + filePath + " 🔘 " + errorMessage;
                     }
                     else
                     {
-                        _files[index] = "✖️ " + filePath;
+                        apkFile[index] = "✖️ " + filePath;
                         goto skipMainTask;
                     }
                 }
