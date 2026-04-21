@@ -76,7 +76,7 @@ namespace Pico2Dock
 
                     foreach (string filePath in files)
                     {
-                        string fileExtension = System.IO.Path.GetExtension(filePath);
+                        string fileExtension = Path.GetExtension(filePath);
                         if (fileExtension == ".apk")
                             _files.Add(filePath);
                     }
@@ -224,8 +224,7 @@ namespace Pico2Dock
             {
                 int index = _files.IndexOf(filePath);
 
-                _files.RemoveAt(index);
-                _files.Insert(index, filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty));
+                _files[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
             }
 
             ChangeStateText($"### Current Status\nCleaning directory...");
@@ -234,7 +233,7 @@ namespace Pico2Dock
             foreach (string filePath in _files.ToList())
             {
                 int index = _files.IndexOf(filePath);
-                string apkName = System.IO.Path.GetFileName(filePath);
+                string apkName = Path.GetFileName(filePath);
                 string outputDir = Path.GetDirectoryName(filePath) + "/Pico";
 
                 // Replace invalid characters with empty string
@@ -245,8 +244,7 @@ namespace Pico2Dock
                     continue;
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                _files.RemoveAt(index);
-                _files.Insert(index, "🛠️ " + filePath);
+                _files[index] = "🛠️ " + filePath;
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
@@ -495,21 +493,19 @@ namespace Pico2Dock
 
                 //?? -------------------- [[ File indicator ]] --------------------
                 IncressProgressBar(_files.Count);
-                _files.RemoveAt(index);
-                _files.Insert(index, "✔️ " + filePath);
+                _files[index] = "✔️ " + filePath;
 
             skipFile:
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    _files.RemoveAt(index);
                     if (_files.Count > 1)
                     {
-                        _files.Insert(index, "✖️ " + filePath + " 🔘 " + errorMessage);
+                        _files[index] = "✖️ " + filePath + " 🔘 " + errorMessage;
                     }
                     else
                     {
-                        _files.Insert(index, "✖️ " + filePath);
+                        _files[index] = "✖️ " + filePath;
                         goto skipMainTask;
                     }
                 }
