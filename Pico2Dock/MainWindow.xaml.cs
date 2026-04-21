@@ -655,9 +655,12 @@ namespace Pico2Dock
                 RemoveButton.IsEnabled = false;
         }
 
-        private void ChangeStateText(string text)
+        public void ChangeStateText(string text)
         {
-            StatusText.Content = text;
+            this.Dispatcher.Invoke(() =>
+            {
+                StatusText.Content = text;
+            });
         }
 
         public static void ApplyTheme()

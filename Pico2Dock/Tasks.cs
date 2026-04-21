@@ -24,12 +24,16 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.2.jar\" decode \"{filePath}\" -q -f -o ./worker",
+                    Arguments = $"-jar \"src/apktool_3.0.2.jar\" decode \"{filePath}\" --output ./worker --force --no-src",
                 }
             };
-
             decompiler.Start();
-            decompiler.WaitForExit();
+
+            while (!decompiler.StandardOutput.EndOfStream)
+            {
+                string line = decompiler.StandardOutput.ReadLine();
+                App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkName}**...\n```{line}```");
+            }
 
             if (decompiler.ExitCode != 0)
                 return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {decompiler.ExitCode}\n```{decompiler.StandardError.ReadToEnd()}```";
@@ -51,12 +55,16 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.2.jar\" build \"./worker\" -q -o \"./singer/{apkName}\"",
+                    Arguments = $"-jar \"src/apktool_3.0.2.jar\" build \"./worker\" --output \"./singer/{apkName}\"",
                 }
             };
-
             compiler.Start();
-            compiler.WaitForExit();
+
+            while (!compiler.StandardOutput.EndOfStream)
+            {
+                string line = compiler.StandardOutput.ReadLine();
+                App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkName}**...\n```{line}```");
+            }
 
             if (compiler.ExitCode != 0)
                 return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {compiler.ExitCode}\n```{compiler.StandardError.ReadToEnd()}```";
@@ -81,9 +89,13 @@ namespace Pico2Dock
                     Arguments = $"-jar \"src/uber-apk-signer-1.3.0.jar\" -a \"./singer/{apkName}\" --ks \"src/keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir}\"",
                 }
             };
-
             signer.Start();
-            signer.WaitForExit();
+
+            while (!signer.StandardOutput.EndOfStream)
+            {
+                string line = signer.StandardOutput.ReadLine();
+                App.mainWindow.ChangeStateText($"### Current Status\nSigning **{apkName}**...\n```{line}```");
+            }
 
             if (signer.ExitCode != 0)
                 return $"### ERROR\n**File:** {apkName}\n**Exit Code:** {signer.ExitCode}\n```{signer.StandardError.ReadToEnd()}```";
