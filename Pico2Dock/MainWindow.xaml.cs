@@ -596,7 +596,7 @@ namespace Pico2Dock
             }
             catch (Exception ex)
             {
-                ChangeStateText($"```{ex}```");
+                ChangeStateText($"```\n{ex}\n```");
             }
 
             try
@@ -617,7 +617,7 @@ namespace Pico2Dock
             }
             catch (Exception ex)
             {
-                ChangeStateText($"```{ex}```");
+                ChangeStateText($"```\n{ex}\n```");
             }
         }
 

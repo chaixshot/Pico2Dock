@@ -32,11 +32,11 @@ namespace Pico2Dock
             while (!decompiler.StandardOutput.EndOfStream)
             {
                 string line = decompiler.StandardOutput.ReadLine();
-                App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkName}**...\n```{line}```");
+                App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkName}**...\n``{line}``");
             }
 
             if (decompiler.ExitCode != 0)
-                return $"**File:** {apkName}\n**Exit Code:** {decompiler.ExitCode}\n```{decompiler.StandardError.ReadToEnd()}```";
+                return $"**Exit Code:** {decompiler.ExitCode}\n```\n{decompiler.StandardError.ReadToEnd()}\n```";
             else
                 return string.Empty;
         }
@@ -63,11 +63,11 @@ namespace Pico2Dock
             while (!compiler.StandardOutput.EndOfStream)
             {
                 string line = compiler.StandardOutput.ReadLine();
-                App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkName}**...\n```{line}```");
+                App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkName}**...\n``{line}``");
             }
 
             if (compiler.ExitCode != 0)
-                return $"**File:** {apkName}\n**Exit Code:** {compiler.ExitCode}\n```{compiler.StandardError.ReadToEnd()}```";
+                return $"**Exit Code:** {compiler.ExitCode}\n```\n{compiler.StandardError.ReadToEnd()}\n```";
             else
                 return string.Empty;
         }
@@ -94,11 +94,11 @@ namespace Pico2Dock
             while (!signer.StandardOutput.EndOfStream)
             {
                 string line = signer.StandardOutput.ReadLine();
-                App.mainWindow.ChangeStateText($"### Current Status\nSigning **{apkName}**...\n```{line}```");
+                App.mainWindow.ChangeStateText($"### Current Status\nSigning **{apkName}**...\n``{line}``");
             }
 
             if (signer.ExitCode != 0)
-                return $"**File:** {apkName}\n**Exit Code:** {signer.ExitCode}\n```{signer.StandardError.ReadToEnd()}```";
+                return $"**Exit Code:** {signer.ExitCode}\n```\n {signer.StandardError.ReadToEnd()} \n```";
             else
                 return string.Empty;
         }
