@@ -3,6 +3,7 @@
   
   # Pico2Dock
   ### Convert the APK file for Pico 4 VR to change the application state from Floating Far app to Dashboard Near Dock, similar to File Manager.<br>Allow multitasking while in a full-screen immersive app.
+  ### [Android Version](https://github.com/chaixshot/Pico2DockAndroid/tree/main)
   </div>
   
   ## 🖥️ Desktop screenshot
@@ -31,7 +32,7 @@ You have to install **.NET runtime 10.0** or higher, and **Java 17** as recommen
 3. Run **Pico2Dock.exe**
 4. Drag & Drop APK files to the drop space
 5. Press the **Start** button and wait for the finish
-6. Dock APK files are in the patched folder, or open by pressing **Open patched folder**
+6. Docked APK files are in **Pico** folder by the same folder as the original file, or right-click the file in the box to see the options.
 7. Copy APK files to the headset and install or install via ``adb install`` command
 
 ## ⁉️ Can an app change state on the fly?
