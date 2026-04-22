@@ -145,17 +145,7 @@ namespace Pico2Dock
             int index = DropBox.SelectedIndex;
 
             if (index > -1 && !IsProcessRunning)
-            {
-                string path = DropBox.SelectedValue.ToString();
-
-                if (path.Contains("✔️"))
-                {
-                    Utils.OpenExplorer(APKFilesOut[index]);
-
-                }
-                else
-                    Utils.OpenExplorer(path.Replace("🛠️ ", string.Empty).Replace("✖️ ", string.Empty));
-            }
+                Utils.OpenExplorer(APKFilesOut[index]);
         }
 
         private void Contextmenu_Remove(object sender, RoutedEventArgs e)
@@ -293,7 +283,7 @@ namespace Pico2Dock
                     int count = 1;
                     while (File.Exists(dirApkOut))
                     {
-                        dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}({count}).apk";
+                        dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]} ({count}).apk";
                         count++;
                     }
                 }
@@ -577,7 +567,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file.\nRight click file in the box above to see an options.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file.\nRight click file in the box above to see the options.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
