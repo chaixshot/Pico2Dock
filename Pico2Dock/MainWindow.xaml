@@ -260,7 +260,7 @@
 
                 <StackPanel
                     Grid.Row="3"
-                    Margin="0,30,0,0"
+                    Margin="0,10,0,0"
                     VerticalAlignment="Top">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -283,7 +283,7 @@
                     <ui:Card Padding="0">
                         <markd:MarkdownViewer
                             x:Name="StatusText"
-                            Height="200"
+                            Height="150"
                             HorizontalContentAlignment="Left"
                             EnableStreaming="False"
                             EnableSyntaxHighlighting="True"

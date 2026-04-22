@@ -44,12 +44,13 @@ namespace Pico2Dock
         #region Parameter
         private bool IsProcessCancel = false;
         private bool IsProcessRunning = false;
-        private ObservableCollection<string> _files = [];
+        private readonly ObservableCollection<string> APKFiles = [];
+        private readonly ObservableCollection<string> APKFilesOut = [];
         public ObservableCollection<string> Files
         {
             get
             {
-                return _files;
+                return APKFiles;
             }
         }
         #endregion
@@ -79,7 +80,10 @@ namespace Pico2Dock
                     {
                         string fileExtension = Path.GetExtension(filePath);
                         if (fileExtension == ".apk")
-                            _files.Add(filePath);
+                        {
+                            APKFiles.Add(filePath);
+                            APKFilesOut.Add(filePath);
+                        }
                     }
                 }
 
@@ -115,7 +119,10 @@ namespace Pico2Dock
             dlg.ShowDialog();
 
             foreach (string filePath in dlg.FileNames)
-                _files.Add(filePath);
+            {
+                APKFiles.Add(filePath);
+                APKFilesOut.Add(filePath);
+            }
 
             DropBox_UpdateText();
         }
@@ -123,19 +130,19 @@ namespace Pico2Dock
         private void DropBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && StartButton.IsEnabled)
-                _files.RemoveAt(DropBox.SelectedIndex);
+                APKFiles.RemoveAt(DropBox.SelectedIndex);
         }
 
         private void DropBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (DropBox.SelectedIndex > -1)
+            int index = DropBox.SelectedIndex;
+            if (index > -1)
             {
                 string path = DropBox.SelectedValue.ToString();
 
                 if (path.Contains("✔️"))
                 {
-                    string outPath = Path.GetDirectoryName(path.Replace("✔️ ", string.Empty)) + "\\Pico";
-                    Utils.OpenExplorer(outPath);
+                    Utils.OpenExplorer(APKFilesOut[index]);
 
                 }
                 else
@@ -145,7 +152,7 @@ namespace Pico2Dock
 
         private void DropBox_UpdateText()
         {
-            if (_files.Count > 0)
+            if (APKFiles.Count > 0)
                 DropBoxButton.Visibility = Visibility.Hidden;
             else
                 DropBoxButton.Visibility = Visibility.Visible;
@@ -162,15 +169,15 @@ namespace Pico2Dock
                 ResetAppearance();
 
                 // Remove file indicator except error
-                foreach (string filePath in Files.ToList())
+                foreach (string filePath in APKFiles.ToList())
                 {
-                    int index = Files.IndexOf(filePath);
+                    int index = APKFiles.IndexOf(filePath);
 
-                    Files[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
+                    APKFiles[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
                 }
 
                 IsProcessRunning = true;
-                MainTask(Files);
+                MainTask(APKFiles);
                 ChangeButtonState();
             }
             else
@@ -193,7 +200,8 @@ namespace Pico2Dock
 
         private void ClearFiles(object sender, RoutedEventArgs e)
         {
-            _files.Clear();
+            APKFiles.Clear();
+            APKFilesOut.Clear();
             ResetAppearance();
             DropBox_UpdateText();
         }
@@ -201,7 +209,7 @@ namespace Pico2Dock
         private void RemoveFiles(object sender, RoutedEventArgs e)
         {
             if (DropBox.SelectedIndex > -1 && !IsProcessRunning)
-                _files.RemoveAt(DropBox.SelectedIndex);
+                APKFiles.RemoveAt(DropBox.SelectedIndex);
         }
 
         private void OpenContent(object sender, RoutedEventArgs e)
@@ -233,7 +241,8 @@ namespace Pico2Dock
             {
                 int index = apkFile.IndexOf(filePath);
                 string apkName = Path.GetFileName(filePath);
-                string outputDir = Path.GetDirectoryName(filePath) + "/Pico";
+                string dirOut = Path.GetDirectoryName(filePath) + "\\Pico";
+                string dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}.apk";
 
 
                 // Replace invalid characters with empty string
@@ -254,6 +263,19 @@ namespace Pico2Dock
                 apkFile[index] = "🛠️ " + filePath;
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
+
+
+                //?? -------------------- [[ Rename ]] --------------------
+                if (Directory.Exists(dirOut) && File.Exists(dirApkOut))
+                {
+                    int count = 1;
+                    while (File.Exists(dirApkOut))
+                    {
+                        dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}({count}).apk";
+                        count++;
+                    }
+                }
+
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nDecompiling **{apkName}**...");
@@ -285,7 +307,7 @@ namespace Pico2Dock
                 await Task.Run(() =>
                 {
                     XNamespace android = "http://schemas.android.com/apk/res/android";
-                    XDocument xmlFile = XDocument.Load("./worker/AndroidManifest.xml");
+                    XDocument xmlFile = XDocument.Load(".\\worker\\AndroidManifest.xml");
                     XElement xmlRoot = xmlFile.Root;
 
                     // Add docked attribute
@@ -396,7 +418,7 @@ namespace Pico2Dock
                         {
                             string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
 
-                            foreach (DirectoryInfo dir in new DirectoryInfo("./worker/res").GetDirectories())
+                            foreach (DirectoryInfo dir in new DirectoryInfo(".\\worker\\res").GetDirectories())
                             {
                                 if (dir.Name.Contains("values"))
                                 {
@@ -420,7 +442,7 @@ namespace Pico2Dock
                         }
                     }
 
-                    xmlFile.Save("./worker/AndroidManifest.xml");
+                    xmlFile.Save(".\\worker\\AndroidManifest.xml");
                 });
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
@@ -447,7 +469,10 @@ namespace Pico2Dock
 
                 await Task.Run(() =>
                 {
-                    errorMessage = Tasks.SignedTask(apkName, outputDir);
+                    errorMessage = Tasks.SignedTask(apkName, dirOut);
+
+                    if (File.Exists($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig"))
+                        File.Delete($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig");
                 });
 
                 if (IsProcessCancel)
@@ -459,52 +484,37 @@ namespace Pico2Dock
                     goto skipFile;
                 }
 
-                //?? -------------------- [[ Rename ]] --------------------
+                //?? -------------------- [[ Move ]] --------------------
                 ChangeStateText($"### Current Status\nFinishing **{apkName}**...");
                 IncressProgressBar(apkFile.Count);
 
-                bool signedFile = File.Exists($"{outputDir}/{apkName[..^4]}-aligned-signed.apk");
-                if (signedFile)
-                {
-                    if (File.Exists($"{outputDir}/{apkName[..^4]}-aligned-signed.apk.idsig"))
-                        File.Delete($"{outputDir}/{apkName[..^4]}-aligned-signed.apk.idsig");
-
-                    if (Directory.Exists(outputDir) && File.Exists($"{outputDir}/PICO_{apkName[..^4]}.apk"))
-                    {
-                        int count = 1;
-                        while (File.Exists($"{outputDir}/PICO_{apkName[..^4]}({count}).apk"))
-                            count++;
-                        File.Move(
-                            $"{outputDir}/{apkName[..^4]}-aligned-signed.apk",
-                            $"{outputDir}/PICO_{apkName[..^4]}({count}).apk"
-                        );
-                    }
-                    else
-                    {
-                        File.Move(
-                            $"{outputDir}/{apkName[..^4]}-aligned-signed.apk",
-                            $"{outputDir}/PICO_{apkName[..^4]}.apk"
-                        );
-                    }
-                }
+                string signedFile = $"{dirOut}\\{apkName[..^4]}-aligned-signed.apk";
+                if (File.Exists(signedFile))
+                    File.Move(
+                        signedFile,
+                        dirApkOut
+                    );
                 else
                 {
                     errorMessage = $"Unable to compile file {apkName}";
-
                     IncressProgressBar(apkFile.Count, 1);
+
                     goto skipFile;
                 }
 
                 ChangeStateText($"### Current Status\nCleaning directory...");
                 await Task.Run(DirectoryCleanup);
 
-                //?? -------------------- [[ File indicator ]] --------------------
-                IncressProgressBar(apkFile.Count);
-                apkFile[index] = "✔️ " + filePath;
-
             skipFile:
 
-                if (!string.IsNullOrEmpty(errorMessage))
+                if (string.IsNullOrEmpty(errorMessage))
+                {
+                    //?? -------------------- [[ File indicator ]] --------------------
+                    IncressProgressBar(apkFile.Count);
+                    apkFile[index] = "✔️ " + filePath;
+                    APKFilesOut[index] = dirApkOut;
+                }
+                else
                 {
                     if (apkFile.Count > 1)
                     {
@@ -545,7 +555,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file. Double click file in the box above to open in File Explorer.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file.\nDouble click file in the box above to open in File Explorer.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
@@ -562,7 +572,7 @@ namespace Pico2Dock
         #region Utils
         private void ChangeButtonState()
         {
-            if (_files.Count > 0 && !IsProcessRunning)
+            if (APKFiles.Count > 0 && !IsProcessRunning)
                 StartButton.IsEnabled = true;
             else
                 StartButton.IsEnabled = false;
@@ -572,7 +582,7 @@ namespace Pico2Dock
             else
                 CancelButton.IsEnabled = false;
 
-            if (_files.Count > 0 && !CancelButton.IsEnabled)
+            if (APKFiles.Count > 0 && !CancelButton.IsEnabled)
                 ClearButton.IsEnabled = true;
             else
                 ClearButton.IsEnabled = false;
@@ -582,11 +592,11 @@ namespace Pico2Dock
         {
             try
             {
-                DirectoryInfo singer = new("./singer");
+                DirectoryInfo singer = new(".\\singer");
 
                 if (singer.Exists)
                 {
-                    foreach (FileInfo file in new DirectoryInfo("./singer").GetFiles())
+                    foreach (FileInfo file in new DirectoryInfo(".\\singer").GetFiles())
                     {
                         file.Delete();
                     }
@@ -599,7 +609,7 @@ namespace Pico2Dock
 
             try
             {
-                DirectoryInfo worker = new("./worker");
+                DirectoryInfo worker = new(".\\worker");
 
                 if (worker.Exists)
                 {
@@ -607,7 +617,7 @@ namespace Pico2Dock
                     {
                         file.Delete();
                     }
-                    foreach (string dir in Directory.GetDirectories("./worker"))
+                    foreach (string dir in Directory.GetDirectories(".\\worker"))
                     {
                         Directory.Delete(dir, true);
                     }

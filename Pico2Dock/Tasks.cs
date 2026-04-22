@@ -24,7 +24,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.2.jar\" decode \"{filePath}\" --output ./worker --force --no-src",
+                    Arguments = $"-jar \"src\\apktool_3.0.2.jar\" decode \"{filePath}\" --output .\\worker --force --no-src",
                 }
             };
             decompiler.Start();
@@ -55,7 +55,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/apktool_3.0.2.jar\" build \"./worker\" --output \"./singer/{apkName}\"",
+                    Arguments = $"-jar \"src\\apktool_3.0.2.jar\" build \".\\worker\" --output \".\\singer\\{apkName}\"",
                 }
             };
             compiler.Start();
@@ -86,7 +86,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src/uber-apk-signer-1.3.0.jar\" --apks \"./singer/{apkName}\" --ks \"src/keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir}\"",
+                    Arguments = $"-jar \"src\\uber-apk-signer-1.3.0.jar\" --apks \".\\singer\\{apkName}\" --ks \"src\\keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir}\"",
                 }
             };
             signer.Start();
