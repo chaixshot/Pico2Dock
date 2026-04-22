@@ -1,4 +1,5 @@
 ﻿using MarkdView;
+using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -35,10 +36,6 @@ namespace Pico2Dock
 
             ResetAppearance();
             ChangeButtonState();
-
-            DropBox.SizeChanged += DropBoxChangeDeleteButton;
-            DropBox.SelectionChanged += DropBoxChangeDeleteButton;
-
         }
 
         #region Parameter
@@ -129,14 +126,25 @@ namespace Pico2Dock
 
         private void DropBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && StartButton.IsEnabled)
+            if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && !IsProcessRunning)
                 APKFiles.RemoveAt(DropBox.SelectedIndex);
         }
 
-        private void DropBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void DropBox_UpdateText()
+        {
+            if (APKFiles.Count > 0)
+                DropBoxButton.Visibility = Visibility.Hidden;
+            else
+                DropBoxButton.Visibility = Visibility.Visible;
+
+            ChangeButtonState();
+        }
+
+        private void Contextmenu_Open(object sender, RoutedEventArgs e)
         {
             int index = DropBox.SelectedIndex;
-            if (index > -1)
+
+            if (index > -1 && !IsProcessRunning)
             {
                 string path = DropBox.SelectedValue.ToString();
 
@@ -150,15 +158,35 @@ namespace Pico2Dock
             }
         }
 
-        private void DropBox_UpdateText()
+        private void Contextmenu_Remove(object sender, RoutedEventArgs e)
         {
-            if (APKFiles.Count > 0)
-                DropBoxButton.Visibility = Visibility.Hidden;
-            else
-                DropBoxButton.Visibility = Visibility.Visible;
+            int index = DropBox.SelectedIndex;
 
-            ChangeButtonState();
+            if (index > -1 && !IsProcessRunning)
+                APKFiles.RemoveAt(index);
         }
+
+        private async void Contextmenu_Delete(object sender, RoutedEventArgs e)
+        {
+            int index = DropBox.SelectedIndex;
+
+            if (index > -1 && !IsProcessRunning)
+            {
+                string apkPath = APKFiles[index];
+                string apkOutPath = APKFilesOut[index];
+                bool isConverted = apkPath.Contains("✔️");
+                string apkTargetPath = isConverted ? apkOutPath : apkPath;
+
+                bool isYes = await DialogBox.Show("Do you want to delete?", apkTargetPath, "Yes", "No");
+
+                if (isYes)
+                {
+                    FileSystem.DeleteFile(apkTargetPath, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+                    APKFiles.RemoveAt(index);
+                }
+            }
+        }
+
         #endregion
 
         #region Button
@@ -204,12 +232,6 @@ namespace Pico2Dock
             APKFilesOut.Clear();
             ResetAppearance();
             DropBox_UpdateText();
-        }
-
-        private void RemoveFiles(object sender, RoutedEventArgs e)
-        {
-            if (DropBox.SelectedIndex > -1 && !IsProcessRunning)
-                APKFiles.RemoveAt(DropBox.SelectedIndex);
         }
 
         private void OpenContent(object sender, RoutedEventArgs e)
@@ -555,7 +577,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file.\nDouble click file in the box above to open in File Explorer.");
+                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file.\nRight click file in the box above to see an options.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
@@ -582,7 +604,7 @@ namespace Pico2Dock
             else
                 CancelButton.IsEnabled = false;
 
-            if (APKFiles.Count > 0 && !CancelButton.IsEnabled)
+            if (APKFiles.Count > 0 && !IsProcessRunning)
                 ClearButton.IsEnabled = true;
             else
                 ClearButton.IsEnabled = false;
@@ -636,14 +658,6 @@ namespace Pico2Dock
             PercentText.Text = string.Empty;
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;
-        }
-
-        private void DropBoxChangeDeleteButton(object sender, dynamic e)
-        {
-            if (!IsProcessRunning && DropBox.SelectedIndex != -1)
-                RemoveButton.IsEnabled = true;
-            else
-                RemoveButton.IsEnabled = false;
         }
 
         public void ChangeStateText(string text)

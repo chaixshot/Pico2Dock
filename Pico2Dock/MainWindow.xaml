@@ -117,7 +117,16 @@
                             Drop="DropBox_Drop"
                             ItemsSource="{Binding Path=Files}"
                             KeyUp="DropBox_KeyUp"
-                            MouseDoubleClick="DropBox_MouseDoubleClick" />
+                            SelectionMode="Single">
+
+                            <ui:ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Click="Contextmenu_Open" Header="Open in Explorer" />
+                                    <MenuItem Click="Contextmenu_Remove" Header="Remove" />
+                                    <MenuItem Click="Contextmenu_Delete" Header="Delete" />
+                                </ContextMenu>
+                            </ui:ListView.ContextMenu>
+                        </ui:ListView>
                         <ui:Button
                             x:Name="DropBoxButton"
                             Height="{Binding ActualHeight, ElementName=card, Mode=OneWay}"
@@ -172,14 +181,6 @@
                             Content="Clear"
                             IsEnabled="False"
                             ToolTip="Clear all files" />
-
-                        <ui:Button
-                            x:Name="RemoveButton"
-                            Width="75"
-                            Margin="0,5,5,0"
-                            Click="RemoveFiles"
-                            Content="Remove"
-                            ToolTip="Remove current select file" />
                     </WrapPanel>
 
                     <StackPanel
@@ -304,5 +305,10 @@
                 </StackPanel>
             </Grid>
         </Grid>
+
+        <ContentPresenter
+            x:Name="DialogHostContainer"
+            MinHeight="167"
+            Visibility="Collapsed" />
     </Grid>
 </ui:FluentWindow>
