@@ -24,7 +24,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src\\apktool_3.0.2.jar\" decode \"{filePath}\" --output .\\worker --force --no-src",
+                    Arguments = $"-jar \"src\\apktool_3.0.2.jar\" decode \"{filePath}\" --output .\\worker --verbose --force --no-src",
                 }
             };
             decompiler.Start();
@@ -55,7 +55,7 @@ namespace Pico2Dock
                     RedirectStandardInput = true,
 
                     FileName = "java",
-                    Arguments = $"-jar \"src\\apktool_3.0.2.jar\" build \".\\worker\" --output \".\\singer\\{apkName}\"",
+                    Arguments = $"-jar \"src\\apktool_3.0.2.jar\" build \".\\worker\" --output \".\\singer\\{apkName}\" --verbose",
                 }
             };
             compiler.Start();
