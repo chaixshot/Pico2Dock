@@ -2,8 +2,10 @@
 using Microsoft.VisualBasic.FileIO;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Media;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
@@ -18,7 +20,7 @@ namespace Pico2Dock
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : FluentWindow
+    public partial class MainWindow : FluentWindow, INotifyPropertyChanged
     {
         public MainWindow()
         {
@@ -39,16 +41,36 @@ namespace Pico2Dock
         }
 
         #region Parameter
-        private bool IsProcessCancel = false;
-        private bool IsProcessRunning = false;
+        private bool isProcessCancel = false;
+        private bool isProcessRunning = false;
         private readonly ObservableCollection<string> APKFiles = [];
         private readonly ObservableCollection<string> APKFilesOut = [];
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public ObservableCollection<string> Files
         {
             get
             {
                 return APKFiles;
             }
+        }
+
+        public bool IsProcessNotRunning
+        {
+            get
+            {
+                return !isProcessRunning;
+            }
+            set
+            {
+                OnPropertyChanged();
+            }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string? propName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
         }
         #endregion
 
@@ -67,7 +89,7 @@ namespace Pico2Dock
 
         private void DropBox_Drop(object sender, DragEventArgs e)
         {
-            if (!IsProcessRunning)
+            if (!isProcessRunning)
             {
                 if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 {
@@ -126,7 +148,7 @@ namespace Pico2Dock
 
         private void DropBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && !IsProcessRunning)
+            if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && !isProcessRunning)
                 APKFiles.RemoveAt(DropBox.SelectedIndex);
         }
 
@@ -144,7 +166,7 @@ namespace Pico2Dock
         {
             int index = DropBox.SelectedIndex;
 
-            if (index > -1 && !IsProcessRunning)
+            if (index > -1 && !isProcessRunning)
                 Utils.OpenExplorer(APKFilesOut[index]);
         }
 
@@ -152,7 +174,7 @@ namespace Pico2Dock
         {
             int index = DropBox.SelectedIndex;
 
-            if (index > -1 && !IsProcessRunning)
+            if (index > -1 && !isProcessRunning)
                 APKFiles.RemoveAt(index);
         }
 
@@ -160,7 +182,7 @@ namespace Pico2Dock
         {
             int index = DropBox.SelectedIndex;
 
-            if (index > -1 && !IsProcessRunning)
+            if (index > -1 && !isProcessRunning)
             {
                 string apkPath = APKFiles[index];
                 string apkOutPath = APKFilesOut[index];
@@ -194,7 +216,8 @@ namespace Pico2Dock
                     APKFiles[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
                 }
 
-                IsProcessRunning = true;
+                isProcessRunning = true;
+                IsProcessNotRunning = true;
                 MainTask(APKFiles);
                 ChangeButtonState();
             }
@@ -206,11 +229,11 @@ namespace Pico2Dock
 
         private void CancelProcess(object sender, RoutedEventArgs e)
         {
-            if (!IsProcessCancel)
+            if (!isProcessCancel)
             {
                 ChangeStateText($"### Current Status\nCanceling process please wait...");
 
-                IsProcessCancel = true;
+                isProcessCancel = true;
                 ChangeButtonState();
                 Tasks.KillTasks();
             }
@@ -244,10 +267,15 @@ namespace Pico2Dock
 
         private async void MainTask(ObservableCollection<string> apkFile)
         {
-            string errorMessage = string.Empty;
-
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(DirectoryCleanup);
+
+            string errorMessage = string.Empty;
+            string namePrefix = AppNamePrefix.Text;
+            bool isHideDock = (bool)SwitchHideDock.IsChecked;
+            bool isRePackage = (bool)CheckBoxPackname.IsChecked;
+            bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
+            bool isRename = (bool)CheckBoxRename.IsChecked;
 
             foreach (string filePath in apkFile.ToList())
             {
@@ -298,7 +326,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.DecompilerTask(filePath);
                 });
 
-                if (IsProcessCancel)
+                if (isProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -311,11 +339,6 @@ namespace Pico2Dock
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
                 IncressProgressBar(apkFile.Count);
 
-                bool isHideDock = (bool)SwitchHideDock.IsChecked;
-                bool isRePackage = (bool)CheckBoxPackname.IsChecked;
-                bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
-                string namePrefix = AppNamePrefix.Text;
-                bool isRename = (bool)CheckBoxRename.IsChecked;
                 await Task.Run(() =>
                 {
                     XNamespace android = "http://schemas.android.com/apk/res/android";
@@ -483,7 +506,7 @@ namespace Pico2Dock
                     errorMessage = Tasks.CompilerTask(apkName);
                 });
 
-                if (IsProcessCancel)
+                if (isProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -504,7 +527,7 @@ namespace Pico2Dock
                         File.Delete($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig");
                 });
 
-                if (IsProcessCancel)
+                if (isProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
@@ -564,7 +587,7 @@ namespace Pico2Dock
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(DirectoryCleanup);
 
-            if (IsProcessCancel)
+            if (isProcessCancel)
             { // Terminate
                 PercentText.Text = "Terminated";
 
@@ -590,7 +613,8 @@ namespace Pico2Dock
             }
 
             StatusProgressBar.Value = 100;
-            IsProcessRunning = false;
+            isProcessRunning = false;
+            IsProcessNotRunning = false;
 
             ChangeButtonState();
 
@@ -601,17 +625,17 @@ namespace Pico2Dock
         #region Utils
         private void ChangeButtonState()
         {
-            if (APKFiles.Count > 0 && !IsProcessRunning)
+            if (APKFiles.Count > 0 && !isProcessRunning)
                 StartButton.IsEnabled = true;
             else
                 StartButton.IsEnabled = false;
 
-            if (!IsProcessCancel && IsProcessRunning)
+            if (!isProcessCancel && isProcessRunning)
                 CancelButton.IsEnabled = true;
             else
                 CancelButton.IsEnabled = false;
 
-            if (APKFiles.Count > 0 && !IsProcessRunning)
+            if (APKFiles.Count > 0 && !isProcessRunning)
                 ClearButton.IsEnabled = true;
             else
                 ClearButton.IsEnabled = false;
@@ -661,7 +685,7 @@ namespace Pico2Dock
         private void ResetAppearance()
         {
             ChangeStateText(string.Empty);
-            IsProcessCancel = false;
+            isProcessCancel = false;
             PercentText.Text = string.Empty;
             StatusProgressBar.Value = 0;
             StatusProgressBar.Foreground = ApplicationAccentColorManager.PrimaryAccentBrush;

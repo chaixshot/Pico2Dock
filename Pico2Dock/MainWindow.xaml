@@ -194,7 +194,10 @@
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top">
                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                <ui:ToggleSwitch x:Name="SwitchHideDock" ToolTip="Put the app on to of everything incluing dock and keyboard" />
+                                <ui:ToggleSwitch
+                                    x:Name="SwitchHideDock"
+                                    IsEnabled="{Binding IsProcessNotRunning, Mode=OneWay}"
+                                    ToolTip="Put the app on to of everything incluing dock and keyboard" />
                                 <ui:TextBlock
                                     Margin="5,0,0,0"
                                     Text="Hide Dock"
@@ -208,7 +211,10 @@
                             VerticalAlignment="Top">
                             <StackPanel>
                                 <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
-                                    <CheckBox x:Name="CheckBoxPackname" ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version.\n\nPackage is more likely not to work, depending on how the app is written and its protection." />
+                                    <CheckBox
+                                        x:Name="CheckBoxPackname"
+                                        IsEnabled="{Binding IsProcessNotRunning, Mode=OneWay}"
+                                        ToolTip="Attempting to auto-rename the package allows to install app alongside the normal version.\n\nPackage is more likely not to work, depending on how the app is written and its protection." />
                                     <ui:TextBlock
                                         Padding="0,5,0,0"
                                         FontSize="16"
@@ -219,7 +225,7 @@
                                 <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
                                     <CheckBox
                                         x:Name="CheckBoxPackAdv"
-                                        IsEnabled="{Binding IsChecked, ElementName=CheckBoxPackname}"
+                                        IsEnabled="{Binding IsProcessNotRunning, Mode=OneWay}"
                                         ToolTip="Rename the package name in advanced mode if normal is not working." />
                                     <ui:TextBlock
                                         Padding="0,5,0,0"
@@ -237,6 +243,7 @@
                                     MinWidth="150"
                                     MaxWidth="150"
                                     VerticalAlignment="Top"
+                                    IsEnabled="{Binding IsProcessNotRunning, Mode=OneWay}"
                                     MaxLength="15"
                                     PlaceholderText="After app name"
                                     TextChanged="AppNamePrefix_TextChanged"
@@ -245,7 +252,7 @@
                                 <StackPanel Margin="-10,0,0,0" Orientation="Horizontal">
                                     <CheckBox
                                         x:Name="CheckBoxRename"
-                                        IsEnabled="False"
+                                        IsEnabled="{Binding IsProcessNotRunning, Mode=OneWay}"
                                         ToolTip="Change the entire app name instead of adding text after." />
                                     <ui:TextBlock
                                         Padding="0,5,0,0"
