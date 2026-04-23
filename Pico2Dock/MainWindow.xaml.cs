@@ -167,7 +167,7 @@ namespace Pico2Dock
                 bool isConverted = apkPath.Contains("✔️");
                 string apkTargetPath = isConverted ? apkOutPath : apkPath;
 
-                bool isYes = await DialogBox.Show("Do you want to delete?", apkTargetPath, "Yes", "No");
+                bool isYes = await DialogBox.Show("Move to Recycle Bin?", apkTargetPath, "Yes", "No");
 
                 if (isYes)
                 {
@@ -369,6 +369,8 @@ namespace Pico2Dock
                         metaData.SetAttributeValue(android + "name", "pico_permission_dim_show");
                         metaData.SetAttributeValue(android + "value", "false");
                         application.Add(metaData);
+
+                        application.Attribute(android + "screenOrientation").SetValue("landscape");
                     }
 
                     // Random package name
