@@ -325,14 +325,24 @@ namespace Pico2Dock
                     // Add docked attribute
                     if (true)
                     {
-                        XElement metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "pico.vr.position");
-                        metaData.SetAttributeValue(android + "value", isHideDock ? "near_dialog" : "near");
+                        XElement metaDataVrPosition = new("meta-data");
+                        metaDataVrPosition.SetAttributeValue(android + "name", "pico.vr.position");
+                        metaDataVrPosition.SetAttributeValue(android + "value", isHideDock ? "near_dialog" : "near");
+
+                        XElement metaDataVrMode = new("meta-data");
+                        metaDataVrMode.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
+                        metaDataVrMode.SetAttributeValue(android + "value", "6");
 
                         foreach (XElement activity in xmlRoot.Descendants("application").Elements("activity"))
-                            activity.Add(metaData);
+                        {
+                            activity.Add(metaDataVrPosition);
+                            activity.Add(metaDataVrMode);
+                        }
                         foreach (XElement alias in xmlRoot.Descendants("application").Elements("activity-alias"))
-                            alias.Add(metaData);
+                        {
+                            alias.Add(metaDataVrPosition);
+                            alias.Add(metaDataVrMode);
+                        }
                     }
 
                     // Pico tag
@@ -348,6 +358,11 @@ namespace Pico2Dock
                         metaData = new("meta-data");
                         metaData.SetAttributeValue(android + "name", "pvr.vrshell.mode");
                         metaData.SetAttributeValue(android + "value", "1");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "com.pvr.hmd.trackingmode");
+                        metaData.SetAttributeValue(android + "value", "3dof");
                         application.Add(metaData);
 
                         metaData = new("meta-data");
