@@ -42,6 +42,7 @@ No, but you can install **Docked** alongside **Floating** by checking the **Rand
 
 ## 🙏 Special thanks to:
 - [apktool](https://github.com/iBotPeaches/Apktool) - Used for decompiling and recompiling Android Package
+- [APKEditor](https://github.com/REAndroid/APKEditor) - Used for fallback decompiling and recompiling Android Package
 - [uber-apk-signer](https://github.com/patrickfav/uber-apk-signer) - Used for signing
 - [WPF-UI](https://github.com/lepoco/wpfui) - Fluent UI theme
 - [MarkdView](https://github.com/hopesy/MarkdView) - Content textbox Markdown Syntax
