@@ -98,7 +98,7 @@ namespace Pico2Dock
                     foreach (string filePath in files)
                     {
                         string fileExtension = Path.GetExtension(filePath);
-                        if (fileExtension == ".apk")
+                        if (Regex.IsMatch(fileExtension, ".*apk*"))
                         {
                             APKFiles.Add(filePath);
                             APKFilesOut.Add(filePath);
@@ -131,7 +131,7 @@ namespace Pico2Dock
         {
             OpenFileDialog dlg = new()
             {
-                Filter = "Android Package (*.apk)|*.apk",
+                Filter = "Android Package (*.apk)|*.*apk*",
                 Multiselect = true
             };
 
@@ -166,7 +166,7 @@ namespace Pico2Dock
         {
             int index = DropBox.SelectedIndex;
 
-            if (index > -1 && !isProcessRunning)
+            if (index > -1)
                 Utils.OpenExplorer(APKFilesOut[index]);
         }
 
@@ -276,34 +276,64 @@ namespace Pico2Dock
             bool isRePackage = (bool)CheckBoxPackname.IsChecked;
             bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
             bool isRename = (bool)CheckBoxRename.IsChecked;
+            bool isApkEditor = false;
 
             foreach (string filePath in apkFile.ToList())
             {
-                int index = apkFile.IndexOf(filePath);
-                string apkName = Path.GetFileName(filePath);
-                string dirOut = Path.GetDirectoryName(filePath) + "\\Pico";
-                string dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}.apk";
-
-
-                // Replace invalid characters with empty string
-                apkName = Regex.Replace(apkName, @"[\x00-\x1f\x7f-\xff\s]", string.Empty);
-
                 // skip is file error from previous task
                 if (filePath.Contains("✖️"))
                     continue;
+                errorMessage = string.Empty;
 
-                if (!File.Exists(filePath))
-                {
-                    errorMessage = $"File **{filePath}** does not exist";
-                    continue;
-                }
-
+                string targetFile = filePath;
+                string apkName = Path.GetFileName(targetFile);
+                string dirOut = Path.GetDirectoryName(targetFile) + "\\Pico";
+                string dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}.apk";
+                int index = apkFile.IndexOf(targetFile);
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                apkFile[index] = "🛠️ " + filePath;
+                apkFile[index] = "🛠️ " + targetFile;
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
+                //?? -------------------- [[ Check file access ]] --------------------
+
+                if (!File.Exists(targetFile))
+                {
+                    errorMessage = $"Can't access file **{targetFile}**";
+                    continue;
+                }
+
+                //?? -------------------- [[ Convert APKM to APK ]] --------------------
+                if (targetFile.EndsWith(".xapk") || targetFile.EndsWith(".apkm") || targetFile.EndsWith(".apks"))
+                {
+                    IncressProgressBar(apkFile.Count);
+
+                    isApkEditor = true;
+
+                    await Task.Run(() =>
+                    {
+                        String newName = apkName.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
+
+                        errorMessage = Tasks.ApkEditor.Merger(targetFile);
+
+                        apkName = newName;
+                        targetFile = Path.GetFullPath($".\\merger\\{Path.GetFileName(apkName)}");
+                        dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}.apk";
+                    });
+                }
+                else
+                    IncressProgressBar(apkFile.Count);
+
+
+                if (isProcessCancel)
+                    goto skipMainTask;
+
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    IncressProgressBar(apkFile.Count, 6);
+                    goto skipFile;
+                }
 
                 //?? -------------------- [[ Rename ]] --------------------
                 if (Directory.Exists(dirOut) && File.Exists(dirApkOut))
@@ -316,14 +346,16 @@ namespace Pico2Dock
                     }
                 }
 
-
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nDecompiling **{apkName}**...");
                 IncressProgressBar(apkFile.Count);
 
                 await Task.Run(() =>
                 {
-                    errorMessage = Tasks.DecompilerTask(filePath);
+                    if (isApkEditor)
+                        errorMessage = Tasks.ApkEditor.Decompiler(targetFile);
+                    else
+                        errorMessage = Tasks.ApkTool.Decompiler(targetFile);
                 });
 
                 if (isProcessCancel)
@@ -393,7 +425,7 @@ namespace Pico2Dock
                         metaData.SetAttributeValue(android + "value", "false");
                         application.Add(metaData);
 
-                        application.Attribute(android + "screenOrientation").SetValue("landscape");
+                        application.SetAttributeValue(android + "screenOrientation", "landscape");
                     }
 
                     // Random package name
@@ -465,12 +497,12 @@ namespace Pico2Dock
                         XElement application = xmlRoot.Element("application");
 
                         if (isRename)
-                            application.Attribute(android + "label").SetValue(namePrefix);
+                            application.SetAttributeValue(android + "label", namePrefix);
                         else
                         {
                             string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
 
-                            foreach (DirectoryInfo dir in new DirectoryInfo(".\\worker\\res").GetDirectories())
+                            foreach (DirectoryInfo dir in new DirectoryInfo(isApkEditor ? ".\\worker\\res" : ".\\resources\\package_1\\res").GetDirectories())
                             {
                                 if (dir.Name.Contains("values"))
                                 {
@@ -503,7 +535,10 @@ namespace Pico2Dock
 
                 await Task.Run(() =>
                 {
-                    errorMessage = Tasks.CompilerTask(apkName);
+                    if (isApkEditor)
+                        errorMessage = Tasks.ApkEditor.Compiler(apkName);
+                    else
+                        errorMessage = Tasks.ApkTool.Compiler(apkName);
                 });
 
                 if (isProcessCancel)
@@ -521,7 +556,7 @@ namespace Pico2Dock
 
                 await Task.Run(() =>
                 {
-                    errorMessage = Tasks.SignedTask(apkName, dirOut);
+                    errorMessage = Tasks.Signed(apkName, dirOut);
 
                     if (File.Exists($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig"))
                         File.Delete($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig");
