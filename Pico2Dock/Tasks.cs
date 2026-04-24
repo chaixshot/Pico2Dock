@@ -100,7 +100,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o {dirWorker} -f -t xml -v -load-dex 10",
+                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o {dirWorker} -f -t xml -load-dex 10",
                     }
                 };
                 decompiler.Start();
@@ -132,7 +132,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} b -i {dirWorker} -o \"{apkFile.FullName}\" -f -t xml -v",
+                        Arguments = $"-jar {exec} b -i {dirWorker} -o \"{apkFile.FullName}\" -f -t xml",
                     }
                 };
                 compiler.Start();

@@ -261,28 +261,39 @@ namespace Pico2Dock
 
         private void IncressProgressBar(double count, double time = 1)
         {
-            StatusProgressBar.Value += ((95 / 7) * time) / count;
+            StatusProgressBar.Value += ((95 / 6) * time) / count;
+            PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
+        }
+
+        private void DecressProgressBar(double count, double time = 1)
+        {
+            StatusProgressBar.Value -= ((95 / 6) * time) / count;
             PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
         }
 
         private async void MainTask(ObservableCollection<string> apkFiles)
         {
-            ChangeStateText($"### Current Status\nCleaning directory...");
-            await Task.Run(Utils.DirectoryCleanup);
-
             string errorMessage = string.Empty;
             string namePrefix = AppNamePrefix.Text;
             bool isHideDock = (bool)SwitchHideDock.IsChecked;
             bool isRePackage = (bool)CheckBoxPackname.IsChecked;
             bool isAdvMode = (bool)CheckBoxPackAdv.IsChecked;
             bool isRename = (bool)CheckBoxRename.IsChecked;
-            bool isApkEditor = false;
 
             foreach (string file in apkFiles.ToList())
             {
                 // skip is file error from previous task
                 if (file.Contains("✖️"))
                     continue;
+
+                int index = apkFiles.IndexOf(file);
+                bool isApkEditor = false;
+
+            startFile:
+
+                ChangeStateText($"### Current Status\nCleaning directory...");
+                await Task.Run(Utils.DirectoryCleanup);
+
                 errorMessage = string.Empty;
 
                 string filePath = Path.GetDirectoryName(file);
@@ -291,9 +302,6 @@ namespace Pico2Dock
                 FileInfo dirOut = new(filePath + "\\Pico");
                 FileInfo dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
                 FileInfo dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
-
-                int index = apkFiles.IndexOf(file);
-
 
                 //?? -------------------- [[ File indicator ]] --------------------
                 apkFiles[index] = "🛠️ " + file;
@@ -332,7 +340,7 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFiles.Count, 6);
+                    IncressProgressBar(apkFiles.Count, 5);
                     goto skipFile;
                 }
 
@@ -365,8 +373,18 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFiles.Count, 5);
-                    goto skipFile;
+                    if (isApkEditor)
+                    {
+                        IncressProgressBar(apkFiles.Count, 4);
+                        goto skipFile;
+                    }
+                    else
+                    {
+                        isApkEditor = true;
+                        DecressProgressBar(apkFiles.Count, 2);
+
+                        goto startFile;
+                    }
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
@@ -548,8 +566,18 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFiles.Count, 3);
-                    goto skipFile;
+                    if (isApkEditor)
+                    {
+                        IncressProgressBar(apkFiles.Count, 2);
+                        goto skipFile;
+                    }
+                    else
+                    {
+                        isApkEditor = true;
+                        DecressProgressBar(apkFiles.Count, 5);
+
+                        goto startFile;
+                    }
                 }
 
                 //?? -------------------- [[ Start signing apk ]] --------------------
@@ -573,12 +601,9 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFiles.Count, 2);
+                    IncressProgressBar(apkFiles.Count, 1);
                     goto skipFile;
                 }
-
-                ChangeStateText($"### Current Status\nCleaning directory...");
-                await Task.Run(Utils.DirectoryCleanup);
 
             skipFile:
 
