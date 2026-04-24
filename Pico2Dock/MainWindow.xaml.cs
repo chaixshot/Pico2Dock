@@ -261,11 +261,11 @@ namespace Pico2Dock
 
         private void IncressProgressBar(double count, double time = 1)
         {
-            StatusProgressBar.Value += ((95 / 6) * time) / count;
+            StatusProgressBar.Value += ((95 / 7) * time) / count;
             PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
         }
 
-        private async void MainTask(ObservableCollection<string> apkFile)
+        private async void MainTask(ObservableCollection<string> apkFiles)
         {
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(Utils.DirectoryCleanup);
@@ -278,52 +278,53 @@ namespace Pico2Dock
             bool isRename = (bool)CheckBoxRename.IsChecked;
             bool isApkEditor = false;
 
-            foreach (string filePath in apkFile.ToList())
+            foreach (string file in apkFiles.ToList())
             {
                 // skip is file error from previous task
-                if (filePath.Contains("✖️"))
+                if (file.Contains("✖️"))
                     continue;
                 errorMessage = string.Empty;
 
-                string targetFile = filePath;
-                string apkName = Path.GetFileName(targetFile);
-                string dirOut = Path.GetDirectoryName(targetFile) + "\\Pico";
-                string dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}.apk";
-                int index = apkFile.IndexOf(targetFile);
+                string filePath = Path.GetDirectoryName(file);
+                FileInfo apkFile = new(file);
+                FileInfo dirUnsign = new(".\\Unsign");
+                FileInfo dirOut = new(filePath + "\\Pico");
+                FileInfo dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
+                FileInfo dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
+
+                int index = apkFiles.IndexOf(file);
+
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                apkFile[index] = "🛠️ " + targetFile;
+                apkFiles[index] = "🛠️ " + file;
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
                 //?? -------------------- [[ Check file access ]] --------------------
 
-                if (!File.Exists(targetFile))
+                if (!apkFile.Exists)
                 {
-                    errorMessage = $"Can't access file **{targetFile}**";
+                    errorMessage = $"Can't access file **{apkFile.FullName}**";
                     continue;
                 }
 
                 //?? -------------------- [[ Convert APKM to APK ]] --------------------
-                if (targetFile.EndsWith(".xapk") || targetFile.EndsWith(".apkm") || targetFile.EndsWith(".apks"))
+                if (apkFile.Name.EndsWith(".xapk") || apkFile.Name.EndsWith(".apkm") || apkFile.Name.EndsWith(".apks"))
                 {
-                    IncressProgressBar(apkFile.Count);
-
-                    isApkEditor = true;
+                    ChangeStateText($"### Current Status\nMerging **{apkFile.Name}**...");
+                    IncressProgressBar(apkFiles.Count);
 
                     await Task.Run(() =>
                     {
-                        String newName = apkName.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
+                        errorMessage = Tasks.ApkEditor.Merger(apkFile);
 
-                        errorMessage = Tasks.ApkEditor.Merger(targetFile);
-
-                        apkName = newName;
-                        targetFile = Path.GetFullPath($".\\merger\\{Path.GetFileName(apkName)}");
-                        dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]}.apk";
+                        apkFile = new(".\\Merger\\" + apkFile.Name.Replace(apkFile.Extension, ".apk"));
+                        dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
+                        dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
                     });
                 }
                 else
-                    IncressProgressBar(apkFile.Count);
+                    IncressProgressBar(apkFiles.Count);
 
 
                 if (isProcessCancel)
@@ -331,31 +332,32 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFile.Count, 6);
+                    IncressProgressBar(apkFiles.Count, 6);
                     goto skipFile;
                 }
 
                 //?? -------------------- [[ Rename ]] --------------------
-                if (Directory.Exists(dirOut) && File.Exists(dirApkOut))
+                if (dirApkOut.Exists)
                 {
                     int count = 1;
-                    while (File.Exists(dirApkOut))
+                    while (new FileInfo($"{dirApkOut.FullName[..^4]} ({count}).apk").Exists)
                     {
-                        dirApkOut = $"{dirOut}\\PICO_{apkName[..^4]} ({count}).apk";
                         count++;
                     }
+                    dirApkOut = new($"{dirApkOut.FullName[..^4]} ({count}).apk");
+                    dirApkUnsing = new($"{dirApkUnsing.FullName[..^4]} ({count}).apk");
                 }
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
-                ChangeStateText($"### Current Status\nDecompiling **{apkName}**...");
-                IncressProgressBar(apkFile.Count);
+                ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...");
+                IncressProgressBar(apkFiles.Count);
 
                 await Task.Run(() =>
                 {
                     if (isApkEditor)
-                        errorMessage = Tasks.ApkEditor.Decompiler(targetFile);
+                        errorMessage = Tasks.ApkEditor.Decompiler(apkFile);
                     else
-                        errorMessage = Tasks.ApkTool.Decompiler(targetFile);
+                        errorMessage = Tasks.ApkTool.Decompiler(apkFile);
                 });
 
                 if (isProcessCancel)
@@ -363,18 +365,18 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFile.Count, 5);
+                    IncressProgressBar(apkFiles.Count, 5);
                     goto skipFile;
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
-                ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkName}**...");
-                IncressProgressBar(apkFile.Count);
+                ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkFile.Name}**...");
+                IncressProgressBar(apkFiles.Count);
 
                 await Task.Run(() =>
                 {
                     XNamespace android = "http://schemas.android.com/apk/res/android";
-                    XDocument xmlFile = XDocument.Load(".\\worker\\AndroidManifest.xml");
+                    XDocument xmlFile = XDocument.Load(".\\Worker\\AndroidManifest.xml");
                     XElement xmlRoot = xmlFile.Root;
 
                     // Add docked attribute
@@ -502,7 +504,7 @@ namespace Pico2Dock
                         {
                             string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
 
-                            foreach (DirectoryInfo dir in new DirectoryInfo(isApkEditor ? ".\\worker\\res" : ".\\resources\\package_1\\res").GetDirectories())
+                            foreach (DirectoryInfo dir in new DirectoryInfo(isApkEditor ? ".\\Worker\\res" : ".\\resources\\package_1\\res").GetDirectories())
                             {
                                 if (dir.Name.Contains("values"))
                                 {
@@ -526,19 +528,19 @@ namespace Pico2Dock
                         }
                     }
 
-                    xmlFile.Save(".\\worker\\AndroidManifest.xml");
+                    xmlFile.Save(".\\Worker\\AndroidManifest.xml");
                 });
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
-                ChangeStateText($"### Current Status\nCompiling **{apkName}**...");
-                IncressProgressBar(apkFile.Count);
+                ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...");
+                IncressProgressBar(apkFiles.Count);
 
                 await Task.Run(() =>
                 {
                     if (isApkEditor)
-                        errorMessage = Tasks.ApkEditor.Compiler(apkName);
+                        errorMessage = Tasks.ApkEditor.Compiler(dirApkUnsing);
                     else
-                        errorMessage = Tasks.ApkTool.Compiler(apkName);
+                        errorMessage = Tasks.ApkTool.Compiler(dirApkUnsing);
                 });
 
                 if (isProcessCancel)
@@ -546,20 +548,24 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFile.Count, 3);
+                    IncressProgressBar(apkFiles.Count, 3);
                     goto skipFile;
                 }
 
                 //?? -------------------- [[ Start signing apk ]] --------------------
-                ChangeStateText($"### Current Status\nSigning **{apkName}**...");
-                IncressProgressBar(apkFile.Count);
+                ChangeStateText($"### Current Status\nSigning **{apkFile.Name}**...");
+                IncressProgressBar(apkFiles.Count);
 
                 await Task.Run(() =>
                 {
-                    errorMessage = Tasks.Signed(apkName, dirOut);
+                    errorMessage = Tasks.UberApkSigner.Signer(dirApkUnsing, dirApkOut);
 
-                    if (File.Exists($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig"))
-                        File.Delete($"{dirOut}\\{apkName[..^4]}-aligned-signed.apk.idsig");
+                    FileInfo dirApkSigned = new($"{dirApkOut.FullName.Replace(dirApkOut.Extension, "")}-aligned-signed.apk");
+                    FileInfo idsig = new(dirApkSigned + ".idsig");
+
+                    dirApkSigned.MoveTo(dirApkOut.FullName);
+                    if (idsig.Exists)
+                        idsig.Delete();
                 });
 
                 if (isProcessCancel)
@@ -567,25 +573,7 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFile.Count, 2);
-                    goto skipFile;
-                }
-
-                //?? -------------------- [[ Move ]] --------------------
-                ChangeStateText($"### Current Status\nFinishing **{apkName}**...");
-                IncressProgressBar(apkFile.Count);
-
-                string signedFile = $"{dirOut}\\{apkName[..^4]}-aligned-signed.apk";
-                if (File.Exists(signedFile))
-                    File.Move(
-                        signedFile,
-                        dirApkOut
-                    );
-                else
-                {
-                    errorMessage = $"Unable to compile file {apkName}";
-                    IncressProgressBar(apkFile.Count, 1);
-
+                    IncressProgressBar(apkFiles.Count, 2);
                     goto skipFile;
                 }
 
@@ -597,19 +585,19 @@ namespace Pico2Dock
                 if (string.IsNullOrEmpty(errorMessage))
                 {
                     //?? -------------------- [[ File indicator ]] --------------------
-                    IncressProgressBar(apkFile.Count);
-                    apkFile[index] = "✔️ " + filePath;
-                    APKFilesOut[index] = dirApkOut;
+                    IncressProgressBar(apkFiles.Count);
+                    apkFiles[index] = "✔️ " + file;
+                    APKFilesOut[index] = dirApkOut.FullName;
                 }
                 else
                 {
-                    if (apkFile.Count > 1)
+                    if (apkFiles.Count > 1)
                     {
-                        apkFile[index] = "✖️ " + filePath + " 🔘 " + errorMessage;
+                        apkFiles[index] = "✖️ " + file + " 🔘 " + errorMessage;
                     }
                     else
                     {
-                        apkFile[index] = "✖️ " + filePath;
+                        apkFiles[index] = "✖️ " + file;
                         goto skipMainTask;
                     }
                 }

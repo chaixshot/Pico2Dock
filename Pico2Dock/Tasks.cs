@@ -5,17 +5,19 @@ namespace Pico2Dock
 {
     internal class Tasks
     {
-        public static Process? decompiler;
-        public static Process? compiler;
-        public static Process? merger;
-        public static Process? signer;
+        private static readonly FileInfo dirWorker = new(".\\Worker");
+        private static Process? decompiler;
+        private static Process? compiler;
+        private static Process? merger;
+        private static Process? signer;
 
         internal class ApkTool
         {
+            private static readonly FileInfo exec = new(".\\src\\apktool_3.0.2.jar");
+
             //?? Decompiler
-            public static string Decompiler(string filePath)
+            public static string Decompiler(FileInfo apkFile)
             {
-                string apkName = System.IO.Path.GetFileName(filePath);
 
                 decompiler = new()
                 {
@@ -29,7 +31,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar \"src\\apktool_3.0.2.jar\" decode \"{filePath}\" --output .\\worker --verbose --force --no-src",
+                        Arguments = $"-jar {exec} decode \"{apkFile.FullName}\" --output {dirWorker} --force --no-src",
                     }
                 };
                 decompiler.Start();
@@ -37,7 +39,7 @@ namespace Pico2Dock
                 while (!decompiler.StandardOutput.EndOfStream)
                 {
                     string line = decompiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkName}**...\n``{line}``");
+                    App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (decompiler.ExitCode != 0)
@@ -47,7 +49,7 @@ namespace Pico2Dock
             }
 
             //?? Decompiler
-            public static string Compiler(string apkName)
+            public static string Compiler(FileInfo apkFile)
             {
                 compiler = new()
                 {
@@ -61,7 +63,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar \"src\\apktool_3.0.2.jar\" build \".\\worker\" --output \".\\singer\\{apkName}\" --verbose",
+                        Arguments = $"-jar {exec} build {dirWorker} --output \"{apkFile.FullName}\"",
                     }
                 };
                 compiler.Start();
@@ -69,7 +71,7 @@ namespace Pico2Dock
                 while (!compiler.StandardOutput.EndOfStream)
                 {
                     string line = compiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkName}**...\n``{line}``");
+                    App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (compiler.ExitCode != 0)
@@ -81,11 +83,11 @@ namespace Pico2Dock
 
         internal class ApkEditor
         {
-            //?? Decompiler
-            public static string Decompiler(string filePath)
-            {
-                string apkName = System.IO.Path.GetFileName(filePath);
+            private static readonly FileInfo exec = new(".\\src\\APKEditor-1.4.8.jar");
 
+            //?? Decompiler
+            public static string Decompiler(FileInfo apkFile)
+            {
                 decompiler = new()
                 {
                     StartInfo = new ProcessStartInfo
@@ -98,7 +100,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar \"src\\APKEditor-1.4.8.jar\" d -i \"{filePath}\" -o .\\worker -f -t xml -res-dir \"resssss/*\" -load-dex 10",
+                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o {dirWorker} -f -t xml -v -load-dex 10",
                     }
                 };
                 decompiler.Start();
@@ -106,7 +108,7 @@ namespace Pico2Dock
                 while (!decompiler.StandardOutput.EndOfStream)
                 {
                     string line = decompiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkName}**...\n``{line}``");
+                    App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (decompiler.ExitCode != 0)
@@ -116,7 +118,7 @@ namespace Pico2Dock
             }
 
             //?? Compiler
-            public static string Compiler(string apkName)
+            public static string Compiler(FileInfo apkFile)
             {
                 compiler = new()
                 {
@@ -130,7 +132,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar \"src\\APKEditor-1.4.8.jar\" b -i \".\\worker\" -o \".\\singer\\{apkName}\" -f -t xml -res-dir \".\\res\"",
+                        Arguments = $"-jar {exec} b -i {dirWorker} -o \"{apkFile.FullName}\" -f -t xml -v",
                     }
                 };
                 compiler.Start();
@@ -138,7 +140,7 @@ namespace Pico2Dock
                 while (!compiler.StandardOutput.EndOfStream)
                 {
                     string line = compiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkName}**...\n``{line}``");
+                    App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (compiler.ExitCode != 0)
@@ -148,9 +150,9 @@ namespace Pico2Dock
             }
 
             //?? Merger
-            public static string Merger(string filePath)
+            public static string Merger(FileInfo apkFile)
             {
-                string apkName = Path.GetFileName(filePath).Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
+                string apkName = apkFile.Name.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
 
                 merger = new()
                 {
@@ -164,7 +166,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar \"src\\APKEditor-1.4.8.jar\" m -i \"{filePath}\" -o \".\\merger\\{apkName}\" -f",
+                        Arguments = $"-jar {exec} m -i \"{apkFile.FullName}\" -o \".\\Merger\\{apkName}\" -f",
                     }
                 };
                 merger.Start();
@@ -182,36 +184,40 @@ namespace Pico2Dock
             }
         }
 
-        //??
-        public static string Signed(string apkName, string outputDir)
+        internal class UberApkSigner
         {
-            signer = new()
+            private static readonly FileInfo exec = new(".\\src\\uber-apk-signer-1.3.0.jar");
+
+            public static string Signer(FileInfo apkFile, FileInfo outputDir)
             {
-                StartInfo = new ProcessStartInfo
+                signer = new()
                 {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
+                    StartInfo = new ProcessStartInfo
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
 
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    RedirectStandardInput = true,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
 
-                    FileName = "java",
-                    Arguments = $"-jar \"src\\uber-apk-signer-1.3.0.jar\" --apks \".\\singer\\{apkName}\" --ks \"src\\keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir}\" --zipAlignPath \"src\\zipalign.exe\"",
+                        FileName = "java",
+                        Arguments = $"-jar {exec} --apks \"{apkFile.FullName}\" --ks \"src\\keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out {outputDir.Directory} --zipAlignPath \"src\\zipalign.exe\"",
+                    }
+                };
+                signer.Start();
+
+                while (!signer.StandardOutput.EndOfStream)
+                {
+                    string line = signer.StandardOutput.ReadLine();
+                    App.mainWindow.ChangeStateText($"### Current Status\nSigning **{apkFile.Name}**...\n``{line}``");
                 }
-            };
-            signer.Start();
 
-            while (!signer.StandardOutput.EndOfStream)
-            {
-                string line = signer.StandardOutput.ReadLine();
-                App.mainWindow.ChangeStateText($"### Current Status\nSigning **{apkName}**...\n``{line}``");
+                if (signer.ExitCode != 0)
+                    return $"**Exit Code:** {signer.ExitCode}\n```\n {signer.StandardError.ReadToEnd()} \n```";
+                else
+                    return string.Empty;
             }
-
-            if (signer.ExitCode != 0)
-                return $"**Exit Code:** {signer.ExitCode}\n```\n {signer.StandardError.ReadToEnd()} \n```";
-            else
-                return string.Empty;
         }
 
         //??

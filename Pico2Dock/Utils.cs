@@ -69,11 +69,11 @@ namespace Pico2Dock
         {
             try
             {
-                DirectoryInfo singer = new(".\\singer");
+                DirectoryInfo Unsign = new(".\\Unsign");
 
-                if (singer.Exists)
+                if (Unsign.Exists)
                 {
-                    foreach (FileInfo file in new DirectoryInfo(".\\singer").GetFiles())
+                    foreach (FileInfo file in new DirectoryInfo(".\\Unsign").GetFiles())
                     {
                         file.Delete();
                     }
