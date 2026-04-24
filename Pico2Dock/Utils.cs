@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 
 namespace Pico2Dock
@@ -61,6 +62,68 @@ namespace Pico2Dock
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        public static void DirectoryCleanup()
+        {
+            try
+            {
+                DirectoryInfo singer = new(".\\singer");
+
+                if (singer.Exists)
+                {
+                    foreach (FileInfo file in new DirectoryInfo(".\\singer").GetFiles())
+                    {
+                        file.Delete();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.mainWindow.ChangeStateText($"```\n{ex}\n```");
+            }
+
+            try
+            {
+                DirectoryInfo worker = new(".\\worker");
+
+                if (worker.Exists)
+                {
+                    foreach (FileInfo file in worker.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (string dir in Directory.GetDirectories(".\\worker"))
+                    {
+                        Directory.Delete(dir, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.mainWindow.ChangeStateText($"```\n{ex}\n```");
+            }
+
+            try
+            {
+                DirectoryInfo merger = new(".\\merger");
+
+                if (merger.Exists)
+                {
+                    foreach (FileInfo file in merger.GetFiles())
+                    {
+                        file.Delete();
+                    }
+                    foreach (string dir in Directory.GetDirectories(".\\merger"))
+                    {
+                        Directory.Delete(dir, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                App.mainWindow.ChangeStateText($"```\n{ex}\n```");
             }
         }
     }

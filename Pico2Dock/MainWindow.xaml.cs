@@ -268,7 +268,7 @@ namespace Pico2Dock
         private async void MainTask(ObservableCollection<string> apkFile)
         {
             ChangeStateText($"### Current Status\nCleaning directory...");
-            await Task.Run(DirectoryCleanup);
+            await Task.Run(Utils.DirectoryCleanup);
 
             string errorMessage = string.Empty;
             string namePrefix = AppNamePrefix.Text;
@@ -555,7 +555,7 @@ namespace Pico2Dock
                 }
 
                 ChangeStateText($"### Current Status\nCleaning directory...");
-                await Task.Run(DirectoryCleanup);
+                await Task.Run(Utils.DirectoryCleanup);
 
             skipFile:
 
@@ -585,7 +585,7 @@ namespace Pico2Dock
             SoundPlayer simpleSound;
 
             ChangeStateText($"### Current Status\nCleaning directory...");
-            await Task.Run(DirectoryCleanup);
+            await Task.Run(Utils.DirectoryCleanup);
 
             if (isProcessCancel)
             { // Terminate
@@ -641,46 +641,7 @@ namespace Pico2Dock
                 ClearButton.IsEnabled = false;
         }
 
-        private void DirectoryCleanup()
-        {
-            try
-            {
-                DirectoryInfo singer = new(".\\singer");
 
-                if (singer.Exists)
-                {
-                    foreach (FileInfo file in new DirectoryInfo(".\\singer").GetFiles())
-                    {
-                        file.Delete();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ChangeStateText($"```\n{ex}\n```");
-            }
-
-            try
-            {
-                DirectoryInfo worker = new(".\\worker");
-
-                if (worker.Exists)
-                {
-                    foreach (FileInfo file in worker.GetFiles())
-                    {
-                        file.Delete();
-                    }
-                    foreach (string dir in Directory.GetDirectories(".\\worker"))
-                    {
-                        Directory.Delete(dir, true);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ChangeStateText($"```\n{ex}\n```");
-            }
-        }
 
         private void ResetAppearance()
         {
