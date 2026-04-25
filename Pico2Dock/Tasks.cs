@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
+using System.Text.RegularExpressions;
 
 namespace Pico2Dock
 {
@@ -152,8 +154,33 @@ namespace Pico2Dock
             //?? Merger
             public static string Merger(FileInfo apkFile)
             {
-                string apkName = apkFile.Name.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
+                FileInfo dirMerger = new(".\\Merger");
 
+                // Copy source file to Merger
+                apkFile = new FileInfo(apkFile.CopyTo($"{dirMerger}\\{apkFile.Name}").ToString());
+
+                // Remove unnecessary architecture 
+                using (ZipArchive zip = ZipFile.Open(apkFile.FullName, ZipArchiveMode.Update))
+                {
+                    zip.Entries.Where(x => x.FullName.Contains("")).ToList()
+                    .ForEach(y =>
+                    {
+                        string fileName = y.FullName;
+
+                        if (Regex.IsMatch(fileName, "split_config.*.apk")) // APKM
+                        {
+                            if (!fileName.Contains("arm64_v8a"))
+                                zip.GetEntry(fileName).Delete();
+                        }
+                        else if (Regex.IsMatch(fileName, "config.*.apk")) // XAPK
+                        {
+                            if (!fileName.Contains("arm64_v8a"))
+                                zip.GetEntry(fileName).Delete();
+                        }
+                    });
+                }
+
+                string apkName = apkFile.Name.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
                 merger = new()
                 {
                     StartInfo = new ProcessStartInfo
@@ -166,7 +193,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} m -i \"{apkFile.FullName}\" -o \".\\Merger\\{apkName}\" -f",
+                        Arguments = $"-jar {exec} m -i \"{apkFile.FullName}\" -o {dirMerger}\\{apkName} -f",
                     }
                 };
                 merger.Start();
