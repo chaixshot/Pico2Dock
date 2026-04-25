@@ -33,7 +33,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} decode \"{apkFile.FullName}\" --output {dirWorker} --force --no-src",
+                        Arguments = $"-jar {exec} decode \"{apkFile.FullName}\" --output \"{dirWorker}\" --force --no-src",
                     }
                 };
                 decompiler.Start();
@@ -65,7 +65,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} build {dirWorker} --output \"{apkFile.FullName}\"",
+                        Arguments = $"-jar {exec} build \"{dirWorker}\" --output \"{apkFile.FullName}\"",
                     }
                 };
                 compiler.Start();
@@ -102,7 +102,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o {dirWorker} -f -t xml -load-dex 10",
+                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o \"{dirWorker}\" -f -t xml -load-dex 10",
                     }
                 };
                 decompiler.Start();
@@ -134,7 +134,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} b -i {dirWorker} -o \"{apkFile.FullName}\" -f -t xml",
+                        Arguments = $"-jar {exec} b -i \"{dirWorker}\" -o \"{apkFile.FullName}\" -f -t xml",
                     }
                 };
                 compiler.Start();
@@ -200,7 +200,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} m -i \"{apkFile.FullName}\" -o {dirMerger}\\{apkName} -f",
+                        Arguments = $"-jar {exec} m -i \"{apkFile.FullName}\" -o \"{dirMerger}\\{apkName}\" -f",
                     }
                 };
                 merger.Start();
@@ -237,7 +237,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} --apks \"{apkFile.FullName}\" --ks \"src\\keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out {outputDir.Directory} --zipAlignPath \"src\\zipalign.exe\"",
+                        Arguments = $"-jar {exec} --apks \"{apkFile.FullName}\" --ks \".\\src\\keystore.jks\" --ksAlias \"H@mer\" --ksKeyPass forpico2dock --ksPass forpico2dock --out \"{outputDir.Directory}\" --zipAlignPath \".\\src\\zipalign.exe\"",
                     }
                 };
                 signer.Start();
