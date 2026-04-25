@@ -318,7 +318,7 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Convert APKM to APK ]] --------------------
-                if (apkFile.Name.EndsWith(".xapk") || apkFile.Name.EndsWith(".apkm") || apkFile.Name.EndsWith(".apks"))
+                if (Regex.IsMatch(apkFile.Name, @".*\.(xapk|apkm|apks)"))
                 {
                     ChangeStateText($"### Current Status\nMerging **{apkFile.Name}**...");
                     IncressProgressBar(apkFiles.Count);
