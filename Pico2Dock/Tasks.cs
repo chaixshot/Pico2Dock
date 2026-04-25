@@ -160,17 +160,31 @@ namespace Pico2Dock
                 apkFile = new FileInfo(apkFile.CopyTo($"{dirMerger}\\{apkFile.Name}").ToString());
 
                 // Remove unnecessary architecture 
+                App.mainWindow.ChangeStateText($"### Current Status\nRemoving unnecessary architecture **{apkFile.Name}**...");
                 using (ZipArchive zip = ZipFile.Open(apkFile.FullName, ZipArchiveMode.Update))
                 {
-                    zip.Entries.Where(x => x.FullName.Contains("")).ToList()
-                    .ForEach(y =>
-                    {
-                        string fileName = y.FullName;
+                    bool pickArm64v8a = false;
 
-                        if (Regex.IsMatch(fileName, "config.*.apk")) // XAPK
-                            if (Regex.IsMatch(fileName, ".*arm64_v8a.*"))
-                                zip.GetEntry(fileName).Delete();
-                    });
+                    foreach (var item in zip.Entries.ToList())
+                    {
+                        string fileName = item.FullName;
+
+                        if (Regex.IsMatch(fileName, @"\w*config.[\w]{3,}.apk")) // is architecture file
+                        {
+                            if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
+                                pickArm64v8a = true;
+                            else
+                            {
+                                if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
+                                {
+                                    if (pickArm64v8a) // is no arm64_v8a
+                                        zip.GetEntry(fileName).Delete();
+                                }
+                                else
+                                    zip.GetEntry(fileName).Delete();
+                            }
+                        }
+                    }
                 }
 
                 string apkName = apkFile.Name.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
@@ -190,6 +204,7 @@ namespace Pico2Dock
                     }
                 };
                 merger.Start();
+                App.mainWindow.ChangeStateText($"### Current Status\nMerging **{apkFile.Name}**...");
 
                 while (!merger.StandardOutput.EndOfStream)
                 {
