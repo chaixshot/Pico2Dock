@@ -98,7 +98,7 @@ namespace Pico2Dock
                     foreach (string filePath in files)
                     {
                         string fileExtension = Path.GetExtension(filePath);
-                        if (Regex.IsMatch(fileExtension, ".*x?apk[ms]?"))
+                        if (Regex.IsMatch(fileExtension, @".*\.x?apk[ms]?"))
                         {
                             APKFiles.Add(filePath);
                             APKFilesOut.Add(filePath);

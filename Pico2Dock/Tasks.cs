@@ -187,7 +187,7 @@ namespace Pico2Dock
                     }
                 }
 
-                string apkName = apkFile.Name.Replace(".xapk", ".apk").Replace(".apkm", ".apk").Replace(".apks", ".apk");
+                string apkName = apkFile.Name.Replace(apkFile.Extension, ".apk");
                 merger = new()
                 {
                     StartInfo = new ProcessStartInfo
