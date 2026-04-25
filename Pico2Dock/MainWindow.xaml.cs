@@ -98,7 +98,7 @@ namespace Pico2Dock
                     foreach (string filePath in files)
                     {
                         string fileExtension = Path.GetExtension(filePath);
-                        if (Regex.IsMatch(fileExtension, ".*apk*"))
+                        if (Regex.IsMatch(fileExtension, ".*x*apkm*"))
                         {
                             APKFiles.Add(filePath);
                             APKFilesOut.Add(filePath);
@@ -131,7 +131,7 @@ namespace Pico2Dock
         {
             OpenFileDialog dlg = new()
             {
-                Filter = "Android Package (*.apk)|*.*apk*",
+                Filter = @"Android Package (*.apk)|*.apk;*.xapk;*.apkm;*.apks",
                 Multiselect = true
             };
 
@@ -398,6 +398,7 @@ namespace Pico2Dock
                     XNamespace android = "http://schemas.android.com/apk/res/android";
                     XDocument xmlFile = XDocument.Load(".\\Worker\\AndroidManifest.xml");
                     XElement xmlRoot = xmlFile.Root;
+                    XElement application = xmlRoot.Element("application");
 
                     // Add docked attribute
                     if (true)
@@ -425,7 +426,6 @@ namespace Pico2Dock
                     // Pico tag
                     if (true)
                     {
-                        XElement application = xmlRoot.Element("application");
                         XElement metaData = new("meta-data");
 
                         metaData.SetAttributeValue(android + "name", "isPUI");
@@ -516,13 +516,13 @@ namespace Pico2Dock
                     // Change app name
                     if (!string.IsNullOrEmpty(namePrefix))
                     {
-                        XElement application = xmlRoot.Element("application");
+                        string app_name = application?.Attribute(android + "label")?.Value;
 
-                        if (isRename)
+                        if (isRename || !Regex.IsMatch(app_name, @"@string\/*"))
                             application.SetAttributeValue(android + "label", namePrefix);
                         else
                         {
-                            string stringID = application?.Attribute(android + "label")?.Value?.Replace("@string/", string.Empty) ?? "app_name";
+                            string stringID = app_name.Replace("@string/", string.Empty);
 
                             foreach (DirectoryInfo dir in new DirectoryInfo(isApkEditor ? ".\\Worker\\res" : ".\\resources\\package_1\\res").GetDirectories())
                             {

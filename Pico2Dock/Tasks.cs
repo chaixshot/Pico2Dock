@@ -167,16 +167,9 @@ namespace Pico2Dock
                     {
                         string fileName = y.FullName;
 
-                        if (Regex.IsMatch(fileName, "split_config.*.apk")) // APKM
-                        {
-                            if (!fileName.Contains("arm64_v8a"))
+                        if (Regex.IsMatch(fileName, "config.*.apk")) // XAPK
+                            if (Regex.IsMatch(fileName, ".*arm64_v8a.*"))
                                 zip.GetEntry(fileName).Delete();
-                        }
-                        else if (Regex.IsMatch(fileName, "config.*.apk")) // XAPK
-                        {
-                            if (!fileName.Contains("arm64_v8a"))
-                                zip.GetEntry(fileName).Delete();
-                        }
                     });
                 }
 
