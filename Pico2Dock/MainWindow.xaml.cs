@@ -629,7 +629,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll APK files have been modified.\nYou can install them using the APK files in Pico folder by the same folder as the original file.\nRight click file in the box above to see the options.");
+                ChangeStateText($"### Current Status\nAll files have been modified.\n* You can install them using the APK files in Pico folder by the same folder as the original file.\n* Right click file in the box above to see the options.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
