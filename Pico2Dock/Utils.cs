@@ -125,6 +125,19 @@ namespace Pico2Dock
             {
                 App.mainWindow.ChangeStateText($"```\n{ex}\n```");
             }
+
+        }
+    }
+
+    internal class ProgressBar(double files, double step)
+    {
+        public double Files = files;
+        public double Step = step;
+
+        public void Incress(double mul = 1)
+        {
+            App.mainWindow.StatusProgressBar.Value += ((100 / Step) * mul) / Files;
+            App.mainWindow.PercentText.Text = Math.Floor(App.mainWindow.StatusProgressBar.Value).ToString() + "%";
         }
     }
 }

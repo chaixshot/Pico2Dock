@@ -259,18 +259,6 @@ namespace Pico2Dock
         }
         #endregion
 
-        private void IncressProgressBar(double count, double time = 1)
-        {
-            StatusProgressBar.Value += ((95 / 6) * time) / count;
-            PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
-        }
-
-        private void DecressProgressBar(double count, double time = 1)
-        {
-            StatusProgressBar.Value -= ((95 / 6) * time) / count;
-            PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString() + "%";
-        }
-
         private async void MainTask(ObservableCollection<string> apkFiles)
         {
             string errorMessage = string.Empty;
@@ -288,6 +276,7 @@ namespace Pico2Dock
 
                 int index = apkFiles.IndexOf(file);
                 bool isApkEditor = false;
+                ProgressBar progressBar = new(apkFiles.Count, 5);
 
             startFile:
 
@@ -320,7 +309,8 @@ namespace Pico2Dock
                 //?? -------------------- [[ Convert APKM to APK ]] --------------------
                 if (Regex.IsMatch(apkFile.Name, @".*\.(xapk|apkm|apks)"))
                 {
-                    IncressProgressBar(apkFiles.Count);
+                    progressBar.Step = 6;
+                    progressBar.Incress();
 
                     await Task.Run(() =>
                     {
@@ -332,16 +322,14 @@ namespace Pico2Dock
                         dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
                     });
                 }
-                else
-                    IncressProgressBar(apkFiles.Count);
-
 
                 if (isProcessCancel)
                     goto skipMainTask;
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFiles.Count, 5);
+                    progressBar.Incress(5);
+
                     goto skipFile;
                 }
 
@@ -359,7 +347,7 @@ namespace Pico2Dock
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...");
-                IncressProgressBar(apkFiles.Count);
+                progressBar.Incress();
 
                 await Task.Run(() =>
                 {
@@ -376,13 +364,14 @@ namespace Pico2Dock
                 {
                     if (isApkEditor)
                     {
-                        IncressProgressBar(apkFiles.Count, 4);
+                        progressBar.Incress(4);
+
                         goto skipFile;
                     }
                     else
                     {
                         isApkEditor = true;
-                        DecressProgressBar(apkFiles.Count, 2);
+                        progressBar.Step += 1;
 
                         goto startFile;
                     }
@@ -390,7 +379,7 @@ namespace Pico2Dock
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
                 ChangeStateText($"### Current Status\nModifing **AndroidManifest.xml** of **{apkFile.Name}**...");
-                IncressProgressBar(apkFiles.Count);
+                progressBar.Incress();
 
                 await Task.Run(() =>
                 {
@@ -552,7 +541,7 @@ namespace Pico2Dock
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
                 ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...");
-                IncressProgressBar(apkFiles.Count);
+                progressBar.Incress();
 
                 await Task.Run(() =>
                 {
@@ -569,13 +558,14 @@ namespace Pico2Dock
                 {
                     if (isApkEditor)
                     {
-                        IncressProgressBar(apkFiles.Count, 2);
+                        progressBar.Incress(2);
+
                         goto skipFile;
                     }
                     else
                     {
                         isApkEditor = true;
-                        DecressProgressBar(apkFiles.Count, 5);
+                        progressBar.Step += 8;
 
                         goto startFile;
                     }
@@ -583,7 +573,7 @@ namespace Pico2Dock
 
                 //?? -------------------- [[ Start signing apk ]] --------------------
                 ChangeStateText($"### Current Status\nSigning **{apkFile.Name}**...");
-                IncressProgressBar(apkFiles.Count);
+                progressBar.Incress();
 
                 await Task.Run(() =>
                 {
@@ -602,7 +592,7 @@ namespace Pico2Dock
 
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    IncressProgressBar(apkFiles.Count, 1);
+                    progressBar.Incress(1);
                     goto skipFile;
                 }
 
@@ -611,7 +601,7 @@ namespace Pico2Dock
                 if (string.IsNullOrEmpty(errorMessage))
                 {
                     //?? -------------------- [[ File indicator ]] --------------------
-                    IncressProgressBar(apkFiles.Count);
+                    progressBar.Incress();
                     apkFiles[index] = "✔️ " + file;
                     APKFilesOut[index] = dirApkOut.FullName;
                 }
