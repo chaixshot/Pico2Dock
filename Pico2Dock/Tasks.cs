@@ -168,33 +168,40 @@ namespace Pico2Dock
                 apkFile = new FileInfo(apkFile.CopyTo($"{dirMerger}\\{apkFile.Name}").ToString());
 
                 // Remove unnecessary architecture 
-                mainWindow.ChangeStateText($"### Merger\n**{apkFile.Name}**\nRemoving unnecessary architecture...");
-                using (ZipArchive zip = ZipFile.Open(apkFile.FullName, ZipArchiveMode.Update))
+                try
                 {
-                    bool pickArm64v8a = false;
-
-                    foreach (var item in zip.Entries.ToList())
-                        if (Regex.IsMatch(item.FullName, ".*arm64_v8a.*")) // is arm64_v8a
-                            pickArm64v8a = true;
-
-                    foreach (var item in zip.Entries.ToList())
+                    mainWindow.ChangeStateText($"### Merger\n**{apkFile.Name}**\nRemoving unnecessary architecture...");
+                    using (ZipArchive zip = ZipFile.Open(apkFile.FullName, ZipArchiveMode.Update))
                     {
-                        string fileName = item.FullName;
+                        bool pickArm64v8a = false;
 
-                        if (Regex.IsMatch(fileName, @"\w*config.[\w]{3,}.apk")) // is architecture file
+                        foreach (var item in zip.Entries.ToList())
+                            if (Regex.IsMatch(item.FullName, ".*arm64_v8a.*")) // is arm64_v8a
+                                pickArm64v8a = true;
+
+                        foreach (var item in zip.Entries.ToList())
                         {
-                            if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
+                            string fileName = item.FullName;
+
+                            if (Regex.IsMatch(fileName, @"\w*config.[\w]{3,}.apk")) // is architecture file
                             {
-                            }
-                            else if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
-                            {
-                                if (pickArm64v8a) // is no arm64_v8a
+                                if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
+                                {
+                                }
+                                else if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
+                                {
+                                    if (pickArm64v8a) // is no arm64_v8a
+                                        zip.GetEntry(fileName).Delete();
+                                }
+                                else if (!Regex.IsMatch(fileName, @".*dpi.[a-z]{3,4}")) // is not density qualifier
                                     zip.GetEntry(fileName).Delete();
                             }
-                            else if (!Regex.IsMatch(fileName, @".*dpi.[a-z]{3,4}")) // is not density qualifier
-                                zip.GetEntry(fileName).Delete();
                         }
                     }
+                }
+                catch (Exception e)
+                {
+                    return $"File **{apkFile.Name}** is not split APK.";
                 }
 
                 string apkName = apkFile.Name.Replace(apkFile.Extension, ".apk");
@@ -214,12 +221,12 @@ namespace Pico2Dock
                     }
                 };
                 merger.Start();
-                mainWindow.ChangeStateText($"### Merger\nMerging multiple splitted **{apkFile.Name}**...");
+                mainWindow.ChangeStateText($"### Merger\nMerging multiple split **{apkFile.Name}**...");
 
                 while (!merger.StandardError.EndOfStream)
                 {
                     string line = merger.StandardError.ReadLine();
-                    mainWindow.ChangeStateText($"### Merger\nMerging multiple splitted **{apkFile.Name}**...\n``{line}``");
+                    mainWindow.ChangeStateText($"### Merger\nMerging multiple split **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (merger.ExitCode != 0)
