@@ -275,9 +275,9 @@ namespace Pico2Dock
                 merger?.Kill(true);
                 signer?.Kill(true);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                App.mainWindow.ChangeStateText($"```\n{ex}\n```");
             }
         }
     }
