@@ -136,7 +136,7 @@
                             Background="Transparent"
                             BorderBrush="{x:Null}"
                             Click="DropBox_Click"
-                            Content="Drag and drop APK file here, or click here to choose a file"
+                            Content="Drag and drop (X)APK(M, S) file here, or click here to choose a file"
                             Cursor="Hand"
                             DragLeave="DropBox_DragLeave"
                             DragOver="DropBox_DragOver"
