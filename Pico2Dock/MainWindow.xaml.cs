@@ -309,7 +309,7 @@ namespace Pico2Dock
                 //?? -------------------- [[ Convert APKM to APK ]] --------------------
                 if (Regex.IsMatch(apkFile.Name, @".*\.(xapk|apkm|apks)"))
                 {
-                    progressBar.Step = 6;
+                    progressBar.Step += 1;
                     progressBar.Increase();
 
                     await Task.Run(() =>
