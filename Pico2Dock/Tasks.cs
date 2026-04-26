@@ -174,23 +174,25 @@ namespace Pico2Dock
                     bool pickArm64v8a = false;
 
                     foreach (var item in zip.Entries.ToList())
+                        if (Regex.IsMatch(item.FullName, ".*arm64_v8a.*")) // is arm64_v8a
+                            pickArm64v8a = true;
+
+                    foreach (var item in zip.Entries.ToList())
                     {
                         string fileName = item.FullName;
 
                         if (Regex.IsMatch(fileName, @"\w*config.[\w]{3,}.apk")) // is architecture file
                         {
                             if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
-                                pickArm64v8a = true;
-                            else
                             {
-                                if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
-                                {
-                                    if (pickArm64v8a) // is no arm64_v8a
-                                        zip.GetEntry(fileName).Delete();
-                                }
-                                else
+                            }
+                            else if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
+                            {
+                                if (pickArm64v8a) // is no arm64_v8a
                                     zip.GetEntry(fileName).Delete();
                             }
+                            else if (!Regex.IsMatch(fileName, @".*dpi.[a-z]{3,4}")) // is not density qualifier
+                                zip.GetEntry(fileName).Delete();
                         }
                     }
                 }
