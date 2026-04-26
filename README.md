@@ -2,7 +2,7 @@
   <img src="Pico2Dock/src/icon.ico" width="128" height="128"/>
   
   # Pico2Dock
-  ### Convert the APK file for Pico 4 VR to change the application state from Floating Far app to Dashboard Near Dock, similar to File Manager.<br>Allow multitasking while in a full-screen immersive app.
+  ### Convert the (X)APK(M, S) file for Pico 4 VR to change the application state from Floating Far app to Dashboard Near Dock, similar to File Manager.<br>Allow multitasking while in a full-screen immersive app.
   ### [Android Version](https://github.com/chaixshot/Pico2DockAndroid/tree/main)
   </div>
   
@@ -24,7 +24,8 @@
 
 You have to install **.NET runtime 10.0** or higher, and **Java 17** as recommended.
 
-[Pico 4](https://www.picoxr.com/products/pico4) supports APK Architecture **arm64-v8a**, **armeabi-v7a**, and **armeabi**.
+The file that [Pico 4](https://www.picoxr.com/products/pico4) supported architecture **arm64-v8a**, **armeabi-v7a**, and **armeabi**.\
+It can be **.apk**, **.xapk**, **.apkm**, and **.apks**.
 
 ## 📐 How to use? 
 1. Read and finish the [Prerequisites](#%EF%B8%8F-prerequisites)
