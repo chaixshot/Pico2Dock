@@ -86,7 +86,7 @@ namespace Pico2Dock
 
             try
             {
-                DirectoryInfo worker = new(".\\worker");
+                DirectoryInfo worker = new(".\\Worker");
 
                 if (worker.Exists)
                 {
@@ -94,7 +94,7 @@ namespace Pico2Dock
                     {
                         file.Delete();
                     }
-                    foreach (string dir in Directory.GetDirectories(".\\worker"))
+                    foreach (string dir in Directory.GetDirectories(".\\Worker"))
                     {
                         Directory.Delete(dir, true);
                     }
@@ -107,7 +107,7 @@ namespace Pico2Dock
 
             try
             {
-                DirectoryInfo merger = new(".\\merger");
+                DirectoryInfo merger = new(".\\Merger");
 
                 if (merger.Exists)
                 {
@@ -115,7 +115,7 @@ namespace Pico2Dock
                     {
                         file.Delete();
                     }
-                    foreach (string dir in Directory.GetDirectories(".\\merger"))
+                    foreach (string dir in Directory.GetDirectories(".\\Merger"))
                     {
                         Directory.Delete(dir, true);
                     }
