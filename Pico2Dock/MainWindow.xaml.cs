@@ -346,7 +346,6 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
-                ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...");
                 progressBar.Incress();
 
                 await Task.Run(() =>
@@ -540,7 +539,6 @@ namespace Pico2Dock
                 });
 
                 //?? -------------------- [[ Start compiler apk ]] --------------------
-                ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...");
                 progressBar.Incress();
 
                 await Task.Run(() =>
@@ -572,7 +570,6 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Start signing apk ]] --------------------
-                ChangeStateText($"### Current Status\nSigning **{apkFile.Name}**...");
                 progressBar.Incress();
 
                 await Task.Run(() =>

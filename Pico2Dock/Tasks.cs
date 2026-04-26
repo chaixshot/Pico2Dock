@@ -8,6 +8,7 @@ namespace Pico2Dock
     internal class Tasks
     {
         private static readonly FileInfo dirWorker = new(".\\Worker");
+        private static readonly MainWindow mainWindow = App.mainWindow;
         private static Process? decompiler;
         private static Process? compiler;
         private static Process? merger;
@@ -20,6 +21,7 @@ namespace Pico2Dock
             //?? Decompiler
             public static string Decompiler(FileInfo apkFile)
             {
+                mainWindow.ChangeStateText($"### Decoder\nDecompiling resources of **{apkFile.Name}**...");
 
                 decompiler = new()
                 {
@@ -41,7 +43,7 @@ namespace Pico2Dock
                 while (!decompiler.StandardOutput.EndOfStream)
                 {
                     string line = decompiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...\n``{line}``");
+                    mainWindow.ChangeStateText($"### Decoder\nDecompiling resources of **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (decompiler.ExitCode != 0)
@@ -53,6 +55,8 @@ namespace Pico2Dock
             //?? Decompiler
             public static string Compiler(FileInfo apkFile)
             {
+                mainWindow.ChangeStateText($"### Encoder\nBuilding **{apkFile.Name}**...");
+
                 compiler = new()
                 {
                     StartInfo = new ProcessStartInfo
@@ -73,7 +77,7 @@ namespace Pico2Dock
                 while (!compiler.StandardOutput.EndOfStream)
                 {
                     string line = compiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...\n``{line}``");
+                    mainWindow.ChangeStateText($"### Encoder\nBuilding **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (compiler.ExitCode != 0)
@@ -90,6 +94,8 @@ namespace Pico2Dock
             //?? Decompiler
             public static string Decompiler(FileInfo apkFile)
             {
+                mainWindow.ChangeStateText($"### Decoder\nDecompiling resources of **{apkFile.Name}**...");
+
                 decompiler = new()
                 {
                     StartInfo = new ProcessStartInfo
@@ -107,10 +113,10 @@ namespace Pico2Dock
                 };
                 decompiler.Start();
 
-                while (!decompiler.StandardOutput.EndOfStream)
+                while (!decompiler.StandardError.EndOfStream)
                 {
-                    string line = decompiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nDecompiling **{apkFile.Name}**...\n``{line}``");
+                    string line = decompiler.StandardError.ReadLine();
+                    mainWindow.ChangeStateText($"### Decoder\nDecompiling resources of **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (decompiler.ExitCode != 0)
@@ -122,6 +128,8 @@ namespace Pico2Dock
             //?? Compiler
             public static string Compiler(FileInfo apkFile)
             {
+                mainWindow.ChangeStateText($"### Encoder\nBuilding **{apkFile.Name}**...");
+
                 compiler = new()
                 {
                     StartInfo = new ProcessStartInfo
@@ -139,10 +147,10 @@ namespace Pico2Dock
                 };
                 compiler.Start();
 
-                while (!compiler.StandardOutput.EndOfStream)
+                while (!compiler.StandardError.EndOfStream)
                 {
-                    string line = compiler.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nCompiling **{apkFile.Name}**...\n``{line}``");
+                    string line = compiler.StandardError.ReadLine();
+                    mainWindow.ChangeStateText($"### Encoder\nBuilding **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (compiler.ExitCode != 0)
@@ -160,7 +168,7 @@ namespace Pico2Dock
                 apkFile = new FileInfo(apkFile.CopyTo($"{dirMerger}\\{apkFile.Name}").ToString());
 
                 // Remove unnecessary architecture 
-                App.mainWindow.ChangeStateText($"### Current Status\nRemoving unnecessary architecture **{apkFile.Name}**...");
+                mainWindow.ChangeStateText($"### Merger\n**{apkFile.Name}**\nRemoving unnecessary architecture...");
                 using (ZipArchive zip = ZipFile.Open(apkFile.FullName, ZipArchiveMode.Update))
                 {
                     bool pickArm64v8a = false;
@@ -204,12 +212,12 @@ namespace Pico2Dock
                     }
                 };
                 merger.Start();
-                App.mainWindow.ChangeStateText($"### Current Status\nMerging **{apkFile.Name}**...");
+                mainWindow.ChangeStateText($"### Merger\nMerging multiple splitted **{apkFile.Name}**...");
 
-                while (!merger.StandardOutput.EndOfStream)
+                while (!merger.StandardError.EndOfStream)
                 {
-                    string line = merger.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nMerging **{apkName}**...\n``{line}``");
+                    string line = merger.StandardError.ReadLine();
+                    mainWindow.ChangeStateText($"### Merger\nMerging multiple splitted **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (merger.ExitCode != 0)
@@ -225,6 +233,8 @@ namespace Pico2Dock
 
             public static string Signer(FileInfo apkFile, FileInfo outputDir)
             {
+                mainWindow.ChangeStateText($"### Signer\nSigning **{apkFile.Name}**`");
+
                 signer = new()
                 {
                     StartInfo = new ProcessStartInfo
@@ -245,7 +255,7 @@ namespace Pico2Dock
                 while (!signer.StandardOutput.EndOfStream)
                 {
                     string line = signer.StandardOutput.ReadLine();
-                    App.mainWindow.ChangeStateText($"### Current Status\nSigning **{apkFile.Name}**...\n``{line}``");
+                    mainWindow.ChangeStateText($"### Signer\nSigning **{apkFile.Name}**...\n``{line}``");
                 }
 
                 if (signer.ExitCode != 0)
