@@ -314,7 +314,7 @@ namespace Pico2Dock
                     errorMessage = await Task.Run(() => Tasks.ApkEditor.Merger(apkFile));
 
                     isApkEditor = true;
-                    apkFile = new($"{dirMerger}\\{apkFile.Name.Replace(apkFile.Extension, ".apk")}");
+                    apkFile = new($"{dirMerger}\\{Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", "")}");
                     dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
                     dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
 
@@ -569,7 +569,7 @@ namespace Pico2Dock
 
                 errorMessage = await Task.Run(() => Tasks.UberApkSigner.Signer(dirApkUnsing, dirApkOut));
 
-                FileInfo dirApkSigned = new($"{dirApkOut.FullName.Replace(dirApkOut.Extension, "")}-aligned-signed.apk");
+                FileInfo dirApkSigned = new($"{Regex.Replace(dirApkOut.FullName, $@"{dirApkOut.Extension}$", "")}-aligned-signed.apk");
                 FileInfo idsig = new(dirApkSigned + ".idsig");
 
                 dirApkSigned.MoveTo(dirApkOut.FullName);
