@@ -183,7 +183,7 @@ namespace Pico2Dock
                         {
                             string fileName = item.FullName;
 
-                            if (Regex.IsMatch(fileName, @"\w*config.[\w]{3,}.apk")) // is architecture file
+                            if (Regex.IsMatch(fileName, @".*config\.\w{3,}(?<!dpi)\.apk$")) // is architecture file
                             {
                                 if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
                                 {
@@ -193,7 +193,7 @@ namespace Pico2Dock
                                     if (pickArm64v8a) // is no arm64_v8a
                                         zip.GetEntry(fileName).Delete();
                                 }
-                                else if (!Regex.IsMatch(fileName, @".*dpi.[a-z]{3,4}")) // is not density qualifier
+                                else
                                     zip.GetEntry(fileName).Delete();
                             }
                         }

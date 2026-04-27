@@ -98,7 +98,7 @@ namespace Pico2Dock
                     foreach (string filePath in files)
                     {
                         string fileExtension = Path.GetExtension(filePath);
-                        if (Regex.IsMatch(fileExtension, @".*\.x?apk[ms]?"))
+                        if (Regex.IsMatch(fileExtension, @".*\.x?apk[ms]?$"))
                         {
                             APKFiles.Add(filePath);
                             APKFilesOut.Add(filePath);
@@ -306,7 +306,7 @@ namespace Pico2Dock
                 }
 
                 //?? -------------------- [[ Convert APKM to APK ]] --------------------
-                if (Regex.IsMatch(apkFile.Name, @".*\.(xapk|apkm|apks)"))
+                if (Regex.IsMatch(apkFile.Name, @".*\.(xapk|apkm|apks)$"))
                 {
                     progressBar.Step += 1;
                     progressBar.Increase();
@@ -629,7 +629,7 @@ namespace Pico2Dock
             { // Success
                 PercentText.Text = "Successful";
 
-                ChangeStateText($"### Current Status\nAll files have been modified.\n* You can install them using the APK files in Pico folder by the same folder as the original file.\n* Right click file in the box above to see the options.");
+                ChangeStateText($"### Current Status\nAll files have been modified.\n* The APK files are in the Pico folder by the same directory as the original file.\n* Right click file in the box above to see the options.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
                 simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
             }
