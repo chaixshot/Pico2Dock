@@ -109,7 +109,7 @@ namespace Pico2Dock
                 Button? button = sender as Button;
                 button?.Background = new SolidColorBrush(Color.FromRgb(255, 255, 255));
 
-                DropBox_UpdateText();
+                ChangeButtonState();
             }
         }
 
@@ -143,23 +143,17 @@ namespace Pico2Dock
                 APKFilesOut.Add(filePath);
             }
 
-            DropBox_UpdateText();
+            ChangeButtonState();
         }
 
         private void DropBox_KeyUp(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key == Key.Delete && DropBox.SelectedIndex > -1 && !isProcessRunning)
+            {
                 APKFiles.RemoveAt(DropBox.SelectedIndex);
-        }
+                ChangeButtonState();
+            }
 
-        private void DropBox_UpdateText()
-        {
-            if (APKFiles.Count > 0)
-                DropBoxButton.Visibility = Visibility.Hidden;
-            else
-                DropBoxButton.Visibility = Visibility.Visible;
-
-            ChangeButtonState();
         }
 
         private void Contextmenu_Open(object sender, RoutedEventArgs e)
@@ -175,7 +169,11 @@ namespace Pico2Dock
             int index = DropBox.SelectedIndex;
 
             if (index > -1 && !isProcessRunning)
+            {
                 APKFiles.RemoveAt(index);
+                ChangeButtonState();
+            }
+
         }
 
         private async void Contextmenu_Delete(object sender, RoutedEventArgs e)
@@ -193,8 +191,19 @@ namespace Pico2Dock
 
                 if (isYes)
                 {
-                    FileSystem.DeleteFile(apkTargetPath, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
-                    APKFiles.RemoveAt(index);
+                    try
+                    {
+                        if (!isConverted)
+                        {
+                            APKFiles.RemoveAt(index);
+                            ChangeButtonState();
+                        }
+                        FileSystem.DeleteFile(apkTargetPath, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+                    }
+                    catch (Exception ex)
+                    {
+                        DialogBox.Show("File dost not exist", apkTargetPath, "", "Ok");
+                    }
                 }
             }
         }
@@ -244,7 +253,7 @@ namespace Pico2Dock
             APKFiles.Clear();
             APKFilesOut.Clear();
             ResetAppearance();
-            DropBox_UpdateText();
+            ChangeButtonState();
         }
 
         private void OpenContent(object sender, RoutedEventArgs e)
@@ -661,6 +670,11 @@ namespace Pico2Dock
                 ClearButton.IsEnabled = true;
             else
                 ClearButton.IsEnabled = false;
+
+            if (APKFiles.Count > 0)
+                DropBoxButton.Visibility = Visibility.Hidden;
+            else
+                DropBoxButton.Visibility = Visibility.Visible;
         }
 
 
