@@ -183,7 +183,7 @@ namespace Pico2Dock
                         {
                             string fileName = item.FullName;
 
-                            if (Regex.IsMatch(fileName, @".*config\.\w{3,}(?<!dpi)\.apk$")) // is architecture file
+                            if (Regex.IsMatch(fileName, @".*config\..{3,}(?<!dpi)\.apk$")) // is architecture file
                             {
                                 if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
                                 {
