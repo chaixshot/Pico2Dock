@@ -205,7 +205,7 @@ namespace Pico2Dock
                     return $"File **{apkFile.Name}** is not split APK.";
                 }
 
-                string apkName = Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", "");
+                string apkName = Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", ".apk");
                 merger = new()
                 {
                     StartInfo = new ProcessStartInfo

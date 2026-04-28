@@ -323,7 +323,7 @@ namespace Pico2Dock
                     errorMessage = await Task.Run(() => Tasks.ApkEditor.Merger(apkFile));
 
                     isApkEditor = true;
-                    apkFile = new($"{dirMerger}\\{Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", "")}");
+                    apkFile = new($"{dirMerger}\\{Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", ".apk")}");
                     dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
                     dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
 
@@ -671,7 +671,6 @@ namespace Pico2Dock
             else
                 DropBoxButton.Visibility = Visibility.Visible;
         }
-
 
 
         private void ResetAppearance()
