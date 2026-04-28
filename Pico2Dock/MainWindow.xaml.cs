@@ -296,9 +296,9 @@ namespace Pico2Dock
 
                 string filePath = Path.GetDirectoryName(file);
                 FileInfo apkFile = new(file);
-                FileInfo dirUnsign = new(".\\Unsign");
-                FileInfo dirMerger = new(".\\Merger");
-                FileInfo dirOut = new(filePath + "\\Pico");
+                DirectoryInfo dirUnsign = new(".\\Unsign");
+                DirectoryInfo dirMerger = new(".\\Merger");
+                DirectoryInfo dirOut = new(filePath + "\\Pico");
                 FileInfo dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
                 FileInfo dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
 

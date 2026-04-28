@@ -7,7 +7,7 @@ namespace Pico2Dock
 {
     internal class Tasks
     {
-        private static readonly FileInfo dirWorker = new(".\\Worker");
+        private static readonly DirectoryInfo dirWorker = new(".\\Worker");
         private static readonly MainWindow mainWindow = App.mainWindow;
         private static Process? decompiler;
         private static Process? compiler;
@@ -162,7 +162,8 @@ namespace Pico2Dock
             //?? Merger
             public static string Merger(FileInfo apkFile)
             {
-                FileInfo dirMerger = new(".\\Merger");
+                DirectoryInfo dirMerger = new(".\\Merger");
+                dirMerger.Create();
 
                 // Copy source file to Merger
                 apkFile = new FileInfo(apkFile.CopyTo($"{dirMerger}\\{apkFile.Name}").ToString());
