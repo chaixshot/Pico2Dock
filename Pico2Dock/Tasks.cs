@@ -167,7 +167,7 @@ namespace Pico2Dock
                 // Copy source file to Merger
                 apkFile = new FileInfo(apkFile.CopyTo($"{dirMerger}\\{apkFile.Name}").ToString());
 
-                // Remove unnecessary architecture 
+                // Clean unnecessary architecture 
                 try
                 {
                     mainWindow.ChangeStateText($"### Merger\n**{apkFile.Name}**\nRemoving unnecessary architecture...");
@@ -185,16 +185,16 @@ namespace Pico2Dock
 
                             if (Regex.IsMatch(fileName, @".*config\..{3,}(?<!dpi)\.apk$")) // is architecture file
                             {
-                                if (Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is arm64_v8a
+                                if (!Regex.IsMatch(fileName, ".*arm64_v8a.*")) // is not arm64_v8a
                                 {
-                                }
-                                else if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
-                                {
-                                    if (pickArm64v8a) // is no arm64_v8a
+                                    if (Regex.IsMatch(fileName, ".*armeabi_v7a.*")) // is armeabi_v7a
+                                    {
+                                        if (pickArm64v8a) // is no arm64_v8a
+                                            zip.GetEntry(fileName).Delete();
+                                    }
+                                    else
                                         zip.GetEntry(fileName).Delete();
                                 }
-                                else
-                                    zip.GetEntry(fileName).Delete();
                             }
                         }
                     }
