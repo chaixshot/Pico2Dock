@@ -441,8 +441,7 @@ namespace Pico2Dock
                     if (isRePackage)
                     {
                         string packageName = xmlRoot.Attribute("package").Value;
-                        string ranPrefix = Utils.GenerateString(6);
-                        string newPackageName = $"{packageName}{ranPrefix}";
+                        string newPackageName = $"{packageName}DOCK";
 
                         // Change package name
                         xmlRoot.Attribute("package").SetValue(newPackageName);
@@ -464,7 +463,7 @@ namespace Pico2Dock
                             if (value.Contains(packageName))
                                 provider.SetAttributeValue(android + "authorities", value.Replace(packageName, newPackageName));
                             else
-                                provider.SetAttributeValue(android + "authorities", $"{value}{ranPrefix}");
+                                provider.SetAttributeValue(android + "authorities", $"{value}DOCK");
                         }
 
                         // Change permission
@@ -476,7 +475,7 @@ namespace Pico2Dock
                                 if (isAdvMode)
                                     permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
                                 else
-                                    permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                                    permissions.SetAttributeValue(android + "name", $"{value}DOCK");
                             }
 
                             foreach (XElement permissions in xmlRoot.Descendants("uses-permission"))
@@ -485,7 +484,7 @@ namespace Pico2Dock
                                 if (isAdvMode)
                                     permissions.SetAttributeValue(android + "name", value.Replace(packageName, newPackageName));
                                 else
-                                    permissions.SetAttributeValue(android + "name", $"{value}{ranPrefix}");
+                                    permissions.SetAttributeValue(android + "name", $"{value}DOCK");
                             }
 
                             if (isAdvMode)
