@@ -613,7 +613,6 @@ namespace Pico2Dock
 
             //?? After task
         skipMainTask:
-            SoundPlayer simpleSound;
 
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(Utils.DirectoryCleanup);
@@ -624,7 +623,7 @@ namespace Pico2Dock
 
                 ChangeStateText("### Current Status\nProcess has been terminated.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
-                simpleSound = new(@"c:\Windows\Media\Windows Hardware Fail.wav");
+                SystemSounds.Asterisk.Play();
             }
             else if (!string.IsNullOrEmpty(errorMessage))
             { // Error
@@ -632,7 +631,7 @@ namespace Pico2Dock
 
                 ChangeStateText($"### ERROR\n{errorMessage}");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
-                simpleSound = new(@"c:\Windows\Media\Windows Error.wav");
+                SystemSounds.Hand.Play();
             }
             else
             { // Success
@@ -640,7 +639,7 @@ namespace Pico2Dock
 
                 ChangeStateText($"### Current Status\nAll files have been modified.\n* The APK files are in the Pico folder by the same directory as the original file.\n* Right click file in the box above to see the options.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
-                simpleSound = new(@"c:\Windows\Media\Windows Notify Calendar.wav");
+                SystemSounds.Asterisk.Play();
             }
 
             StatusProgressBar.Value = 100;
@@ -648,9 +647,6 @@ namespace Pico2Dock
             IsProcessNotRunning = false;
 
             ChangeButtonState();
-
-            // Play sound
-            simpleSound.Play();
         }
 
         #region Utils
