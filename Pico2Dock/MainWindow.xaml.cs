@@ -182,27 +182,34 @@ namespace Pico2Dock
 
             if (index > -1 && !isProcessRunning)
             {
-                string apkPath = APKFiles[index];
+                string apkPath = Regex.Replace(APKFiles[index], $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
                 string apkOutPath = APKFilesOut[index];
-                bool isConverted = apkPath.Contains("✔️");
-                string apkTargetPath = isConverted ? apkOutPath : apkPath;
+                FileInfo apkOutFile = new(apkOutPath);
 
+                bool isConverted = APKFiles[index].Contains("✔️") && apkOutFile.Exists;
+                string apkTargetPath = isConverted ? apkOutPath : apkPath;
                 bool isYes = await DialogBox.Show("Move to Recycle Bin?", apkTargetPath, "Yes", "No");
 
                 if (isYes)
                 {
                     try
                     {
-                        if (!isConverted)
+                        FileSystem.DeleteFile(apkTargetPath, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
+                        if (isConverted)
+                        {
+                            DirectoryInfo dirPico = new(apkOutPath.Replace(apkOutFile.Name, ""));
+                            if (dirPico.GetFiles().Length == 0)
+                                dirPico.Delete();
+                        }
+                        else
                         {
                             APKFiles.RemoveAt(index);
                             ChangeButtonState();
                         }
-                        FileSystem.DeleteFile(apkTargetPath, UIOption.AllDialogs, RecycleOption.SendToRecycleBin);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        DialogBox.Show("File dost not exist", apkTargetPath, "", "Ok");
+                        DialogBox.Show("Error", "File dost not exist", "", "Ok");
                     }
                 }
             }
