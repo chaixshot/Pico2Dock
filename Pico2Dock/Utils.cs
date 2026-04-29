@@ -127,4 +127,12 @@ namespace Pico2Dock
             App.mainWindow.PercentText.Text = Math.Floor(App.mainWindow.StatusProgressBar.Value).ToString() + "%";
         }
     }
+
+    public class FileIndicator()
+    {
+        public static readonly string Working = "🛠️";
+        public static readonly string Success = "✔️";
+        public static readonly string Error = "✖️";
+        public static readonly string ErrorInfo = "🔘";
+    }
 }

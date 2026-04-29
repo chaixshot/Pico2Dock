@@ -222,7 +222,7 @@ namespace Pico2Dock
                 {
                     int index = APKFiles.IndexOf(filePath);
 
-                    APKFiles[index] = filePath.Replace("🛠️ ", string.Empty).Replace("✔️ ", string.Empty);
+                    APKFiles[index] = Regex.Replace(filePath, $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
                 }
 
                 isProcessRunning = true;
@@ -232,7 +232,7 @@ namespace Pico2Dock
             }
             else
             {
-                ChangeStateText($"### ERROR\nUnable to run **Java** on machine.\nPlease install [Java 17](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi) as recommended [here](https://download.oracle.com/java/17/archive/jdk-17.0.12_windows-x64_bin.msi).");
+                ChangeStateText($"### ERROR\nUnable to run **Java** on machine.\nPlease install [Java SDK](https://download.oracle.com/java/26/latest/jdk-26_windows-x64_bin.msi) as recommended [here](https://download.oracle.com/java/26/latest/jdk-26_windows-x64_bin.msi).");
             }
         }
 
@@ -280,7 +280,7 @@ namespace Pico2Dock
             foreach (string file in apkFiles.ToList())
             {
                 // skip is file error from previous task
-                if (file.Contains("✖️"))
+                if (file.Contains(FileIndicator.Error))
                     continue;
 
                 int index = apkFiles.IndexOf(file);
@@ -303,7 +303,7 @@ namespace Pico2Dock
                 FileInfo dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                apkFiles[index] = "🛠️ " + file;
+                apkFiles[index] = $"{FileIndicator.Working} {file}";
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
@@ -598,15 +598,15 @@ namespace Pico2Dock
                 {
                     //?? -------------------- [[ File indicator ]] --------------------
                     progressBar.Increase();
-                    apkFiles[index] = "✔️ " + file;
+                    apkFiles[index] = $"{FileIndicator.Success} {file}";
                     APKFilesOut[index] = dirApkOut.FullName;
                 }
                 else
                 {
                     if (apkFiles.Count > 1)
-                        apkFiles[index] = "✖️ " + file + " 🔘 " + errorMessage;
+                        apkFiles[index] = $"{FileIndicator.Error} {file} {FileIndicator.ErrorInfo} {errorMessage}";
                     else
-                        apkFiles[index] = "✖️ " + file;
+                        apkFiles[index] = $"{FileIndicator.Error} {file}";
                 }
             }
 
