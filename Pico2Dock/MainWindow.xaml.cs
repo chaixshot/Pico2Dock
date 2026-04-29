@@ -155,7 +155,9 @@ namespace Pico2Dock
             }
 
         }
+        #endregion
 
+        #region File list context menu
         private void Contextmenu_Open(object sender, RoutedEventArgs e)
         {
             int index = DropBox.SelectedIndex;
@@ -214,10 +216,10 @@ namespace Pico2Dock
                 }
             }
         }
-
         #endregion
 
-        #region Button
+
+        #region Control panel
         private async void StartProcess(object sender, RoutedEventArgs e)
         {
             if (Utils.IsJavaInstalled())
@@ -678,7 +680,6 @@ namespace Pico2Dock
             else
                 DropBoxButton.Visibility = Visibility.Visible;
         }
-
 
         private void ResetAppearance()
         {
