@@ -399,3 +399,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+Pico2Dock/InnoSetup/Pico2Dock_*-Installer.exe
