@@ -41,6 +41,11 @@ No, but you can install **Docked** alongside **Floating** by checking the **Rand
 
 <image src="Resource/Screenshot_both.jpeg" width="400">
 
+## 🔃 Checking for app update?
+Check out [ObtainX](https://github.com/bikram-agarwal/ObtainX) on GitHub.
+
+<image src="Resource/Screenshot_dev.bikram.obtainx_2026.04.30-18.15.18.692_612.jpeg" width="400">
+
 ## 🙏 Special thanks to:
 - [apktool](https://github.com/iBotPeaches/Apktool) - Used for decompiling and recompiling Android Package
 - [APKEditor](https://github.com/REAndroid/APKEditor) - Used for fallback decompiling and recompiling Android Package
