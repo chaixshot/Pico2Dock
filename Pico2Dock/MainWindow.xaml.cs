@@ -431,12 +431,12 @@ namespace Pico2Dock
                             vrMode.SetAttributeValue(android + "value", isMainActivity ? "6" : "2");
 
                             item.Add(vrPosition);
+                            item.Add(vrPositionOverlay);
                             item.Add(vrMode);
                             item.Add(layout);
 
                             item.SetAttributeValue(android + "taskAffinity", ".vrmode");
                             item.SetAttributeValue(android + "resizeableActivity", "true");
-
                             if (isMainActivity)
                                 item.SetAttributeValue(android + "screenOrientation", isPortrait ? "portrait" : "landscape");
                         }
@@ -489,6 +489,11 @@ namespace Pico2Dock
                         metaData = new("meta-data");
                         metaData.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
                         metaData.SetAttributeValue(android + "value", "6");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "pvr.display.orientation");
+                        metaData.SetAttributeValue(android + "value", "180");
                         application.Add(metaData);
 
                         metaData = new("meta-data");
