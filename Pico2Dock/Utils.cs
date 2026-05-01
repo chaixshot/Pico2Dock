@@ -112,7 +112,6 @@ namespace Pico2Dock
             {
                 App.mainWindow.ChangeStateText($"```\n{ex}\n```");
             }
-
         }
     }
 

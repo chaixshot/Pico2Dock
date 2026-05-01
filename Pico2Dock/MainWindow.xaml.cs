@@ -396,30 +396,68 @@ namespace Pico2Dock
                     XElement xmlRoot = xmlFile.Root;
                     XElement application = xmlRoot.Element("application");
 
-                    // Add docked attribute
+                    //** Adding element [root > application > activity]
                     if (true)
                     {
-                        XElement metaDataVrPosition = new("meta-data");
-                        metaDataVrPosition.SetAttributeValue(android + "name", "pico.vr.position");
-                        metaDataVrPosition.SetAttributeValue(android + "value", isHideDock ? "near_dialog" : "near");
+                        bool isPortrait = false;
 
-                        XElement metaDataVrMode = new("meta-data");
-                        metaDataVrMode.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
-                        metaDataVrMode.SetAttributeValue(android + "value", "6");
+                        XElement vrPosition = new("meta-data");
+                        vrPosition.SetAttributeValue(android + "name", "pico.vr.position");
+                        vrPosition.SetAttributeValue(android + "value", isHideDock ? "near_dialog" : "near");
 
-                        foreach (XElement activity in xmlRoot.Descendants("application").Elements("activity"))
+                        XElement vrPositionOverlay = new("meta-data");
+                        vrPositionOverlay.SetAttributeValue(android + "name", "pico.vr.position.overlay");
+                        vrPositionOverlay.SetAttributeValue(android + "value", "far");
+
+                        XElement layout = new("layout");
+                        layout.SetAttributeValue(android + "defaultWidth", "900.0dp");
+                        layout.SetAttributeValue(android + "defaultHeight", isPortrait ? "480.0dp" : "600.0dp");
+
+                        IEnumerable<XElement> activity = xmlRoot.Descendants("application").Elements("activity");
+                        IEnumerable<XElement> activityAlias = xmlRoot.Descendants("application").Elements("activity-alias");
+
+                        foreach (XElement item in activity.Concat(activityAlias))
                         {
-                            activity.Add(metaDataVrPosition);
-                            activity.Add(metaDataVrMode);
-                        }
-                        foreach (XElement alias in xmlRoot.Descendants("application").Elements("activity-alias"))
-                        {
-                            alias.Add(metaDataVrPosition);
-                            alias.Add(metaDataVrMode);
+                            bool isMainActivity = false;
+                            foreach (XElement intentFilter in item.Elements("intent-filter"))
+                            {
+                                foreach (XElement action in intentFilter.Elements("action"))
+                                    if (action.Attribute(android + "name").Value == "android.intent.action.MAIN")
+                                        isMainActivity = true;
+                            }
+
+                            XElement vrMode = new("meta-data");
+                            vrMode.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
+                            vrMode.SetAttributeValue(android + "value", isMainActivity ? "6" : "2");
+
+                            item.Add(vrPosition);
+                            item.Add(vrMode);
+                            item.Add(layout);
+
+                            item.SetAttributeValue(android + "taskAffinity", ".vrmode");
+                            item.SetAttributeValue(android + "resizeableActivity", "true");
+
+                            if (isMainActivity)
+                                item.SetAttributeValue(android + "screenOrientation", isPortrait ? "portrait" : "landscape");
                         }
                     }
 
-                    // Pico tag
+                    //** Adding element [root]
+                    if (true)
+                    {
+                        XElement metaData = new("meta-data");
+
+                        metaData.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
+                        metaData.SetAttributeValue(android + "value", "6");
+                        xmlRoot.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "pvr.display.orientation");
+                        metaData.SetAttributeValue(android + "value", "180");
+                        xmlRoot.Add(metaData);
+                    }
+
+                    //** Adding element [root > application]
                     if (true)
                     {
                         XElement metaData = new("meta-data");
@@ -435,7 +473,7 @@ namespace Pico2Dock
 
                         metaData = new("meta-data");
                         metaData.SetAttributeValue(android + "name", "com.pvr.hmd.trackingmode");
-                        metaData.SetAttributeValue(android + "value", "3dof");
+                        metaData.SetAttributeValue(android + "value", "6dof");
                         application.Add(metaData);
 
                         metaData = new("meta-data");
@@ -443,10 +481,33 @@ namespace Pico2Dock
                         metaData.SetAttributeValue(android + "value", "false");
                         application.Add(metaData);
 
-                        application.SetAttributeValue(android + "screenOrientation", "landscape");
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "feature.support_custom_panel");
+                        metaData.SetAttributeValue(android + "value", "1");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
+                        metaData.SetAttributeValue(android + "value", "6");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "feature");
+                        metaData.SetAttributeValue(android + "value", "2");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "feature_version");
+                        metaData.SetAttributeValue(android + "value", "2");
+                        application.Add(metaData);
+
+                        metaData = new("meta-data");
+                        metaData.SetAttributeValue(android + "name", "channel_id");
+                        metaData.SetAttributeValue(android + "value", "PUI");
+                        application.Add(metaData);
                     }
 
-                    // Random package name
+                    //** Random package name
                     if (isRePackage)
                     {
                         string packageName = xmlRoot.Attribute("package").Value;
@@ -508,7 +569,7 @@ namespace Pico2Dock
                     }
 
 
-                    // Change app name
+                    //** Change app name
                     if (!string.IsNullOrEmpty(namePrefix))
                     {
                         string app_name = application?.Attribute(android + "label")?.Value;
