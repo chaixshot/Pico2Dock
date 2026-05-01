@@ -435,7 +435,7 @@ namespace Pico2Dock
                             item.Add(vrMode);
                             item.Add(layout);
 
-                            item.SetAttributeValue(android + "taskAffinity", ".vrmode");
+                            // item.SetAttributeValue(android + "taskAffinity", ".vrmode"); // Using same recent app icon row
                             item.SetAttributeValue(android + "resizeableActivity", "true");
                             if (isMainActivity)
                                 item.SetAttributeValue(android + "screenOrientation", isPortrait ? "portrait" : "landscape");
