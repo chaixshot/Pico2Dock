@@ -7,85 +7,12 @@ namespace Pico2Dock
 {
     internal class Tasks
     {
-        private static readonly DirectoryInfo dirWorker = new(".\\Worker");
+        public static readonly DirectoryInfo dirWorker = new(".\\Worker");
         private static readonly MainWindow mainWindow = App.mainWindow;
         private static Process? decompiler;
         private static Process? compiler;
         private static Process? merger;
         private static Process? signer;
-
-        internal class ApkTool
-        {
-            private static readonly FileInfo exec = new(".\\src\\apktool_3.0.2.jar");
-
-            //?? Decompiler
-            public static string Decompiler(FileInfo apkFile)
-            {
-                mainWindow.ChangeStateText($"### Decoder\nDecompiling resources of **{apkFile.Name}**...");
-
-                decompiler = new()
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        CreateNoWindow = true,
-                        UseShellExecute = false,
-
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-
-                        FileName = "java",
-                        Arguments = $"-jar {exec} decode \"{apkFile.FullName}\" --output \"{dirWorker}\" --force --no-src",
-                    }
-                };
-                decompiler.Start();
-
-                while (!decompiler.StandardOutput.EndOfStream)
-                {
-                    string line = decompiler.StandardOutput.ReadLine();
-                    mainWindow.ChangeStateText($"### Decoder\nDecompiling resources of **{apkFile.Name}**...\n``{line}``");
-                }
-
-                if (decompiler.ExitCode != 0)
-                    return $"**Exit Code:** {decompiler.ExitCode}\n```\n{decompiler.StandardError.ReadToEnd()}\n```";
-                else
-                    return string.Empty;
-            }
-
-            //?? Decompiler
-            public static string Compiler(FileInfo apkFile)
-            {
-                mainWindow.ChangeStateText($"### Encoder\nBuilding **{apkFile.Name}**...");
-
-                compiler = new()
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        CreateNoWindow = true,
-                        UseShellExecute = false,
-
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        RedirectStandardInput = true,
-
-                        FileName = "java",
-                        Arguments = $"-jar {exec} build \"{dirWorker}\" --output \"{apkFile.FullName}\"",
-                    }
-                };
-                compiler.Start();
-
-                while (!compiler.StandardOutput.EndOfStream)
-                {
-                    string line = compiler.StandardOutput.ReadLine();
-                    mainWindow.ChangeStateText($"### Encoder\nBuilding **{apkFile.Name}**...\n``{line}``");
-                }
-
-                if (compiler.ExitCode != 0)
-                    return $"**Exit Code:** {compiler.ExitCode}\n```\n{compiler.StandardError.ReadToEnd()}\n```";
-                else
-                    return string.Empty;
-            }
-        }
 
         internal class ApkEditor
         {

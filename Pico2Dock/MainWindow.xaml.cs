@@ -293,7 +293,6 @@ namespace Pico2Dock
                     continue;
 
                 int index = apkFiles.IndexOf(file);
-                bool isApkEditor = false;
                 ProgressBar progressBar = new(apkFiles.Count, 5);
 
             startFile:
@@ -331,7 +330,6 @@ namespace Pico2Dock
 
                     errorMessage = await Task.Run(() => Tasks.ApkEditor.Merger(apkFile));
 
-                    isApkEditor = true;
                     apkFile = new($"{dirMerger}\\{Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", ".apk")}");
                     dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
                     dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
@@ -361,28 +359,14 @@ namespace Pico2Dock
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
                 progressBar.Increase();
 
-                if (isApkEditor)
-                    errorMessage = await Task.Run(() => Tasks.ApkEditor.Decompiler(apkFile));
-                else
-                    errorMessage = await Task.Run(() => Tasks.ApkTool.Decompiler(apkFile));
+                errorMessage = await Task.Run(() => Tasks.ApkEditor.Decompiler(apkFile, isRename));
 
                 if (isProcessCancel)
                     goto skipMainTask;
                 else if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    if (isApkEditor)
-                    {
-                        progressBar.Increase(4);
-
-                        goto skipFile;
-                    }
-                    else
-                    {
-                        isApkEditor = true;
-                        progressBar.Step += 1;
-
-                        goto startFile;
-                    }
+                    progressBar.Increase(4);
+                    goto skipFile;
                 }
 
                 //?? -------------------- [[ Edit AndroidManifest.xml ]] --------------------
@@ -623,28 +607,14 @@ namespace Pico2Dock
                 //?? -------------------- [[ Start compiler apk ]] --------------------
                 progressBar.Increase();
 
-                if (isApkEditor)
-                    errorMessage = await Task.Run(() => Tasks.ApkEditor.Compiler(dirApkUnsing));
-                else
-                    errorMessage = await Task.Run(() => Tasks.ApkTool.Compiler(dirApkUnsing));
+                errorMessage = await Task.Run(() => Tasks.ApkEditor.Compiler(dirApkUnsing));
 
                 if (isProcessCancel)
                     goto skipMainTask;
                 else if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    if (isApkEditor)
-                    {
-                        progressBar.Increase(2);
-
-                        goto skipFile;
-                    }
-                    else
-                    {
-                        isApkEditor = true;
-                        progressBar.Step += 8;
-
-                        goto startFile;
-                    }
+                    progressBar.Increase(2);
+                    goto skipFile;
                 }
 
                 //?? -------------------- [[ Start signing apk ]] --------------------
