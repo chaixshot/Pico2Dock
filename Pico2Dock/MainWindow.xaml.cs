@@ -557,6 +557,7 @@ namespace Pico2Dock
                         }
                     }
 
+                    xmlFile.Save(".\\Worker\\AndroidManifest.xml");
 
                     //** Change app name
                     if (!string.IsNullOrEmpty(namePrefix))
@@ -567,33 +568,41 @@ namespace Pico2Dock
                             application.SetAttributeValue(android + "label", namePrefix);
                         else
                         {
+                            int packageIndex = 1;
                             string stringID = app_name.Replace("@string/", string.Empty);
+                            bool isTwoDigit = Directory.Exists($"{Tasks.dirWorker}\\resources\\package_0{packageIndex}\\res");
 
-                            foreach (DirectoryInfo dir in new DirectoryInfo(isApkEditor ? ".\\Worker\\res" : ".\\resources\\package_1\\res").GetDirectories())
+                            while (true)
                             {
-                                if (dir.Name.Contains("values"))
+                                DirectoryInfo package = new($"{Tasks.dirWorker}\\resources\\package_{(isTwoDigit ? packageIndex.ToString("D2") : packageIndex)}\\res");
+                                if (!package.Exists)
+                                    break;
+
+                                foreach (DirectoryInfo dir in package.GetDirectories())
                                 {
-                                    foreach (FileInfo strings in dir.GetFiles("strings.xml"))
+                                    if (dir.Name.Contains("values"))
                                     {
-                                        XDocument stringFile = XDocument.Load(strings.FullName);
-                                        XElement stringRoot = stringFile.Root;
-
-                                        foreach (XElement srt in stringRoot.Elements("string"))
+                                        foreach (FileInfo strings in dir.GetFiles("strings.xml"))
                                         {
-                                            if (srt.Attribute("name").Value.Contains(stringID))
-                                            {
-                                                srt.SetValue($"{srt.Value}{namePrefix}");
-                                            }
-                                        }
+                                            XDocument stringFile = XDocument.Load(strings.FullName);
+                                            XElement stringRoot = stringFile.Root;
 
-                                        stringFile.Save(strings.FullName);
+                                            foreach (XElement srt in stringRoot.Elements("string"))
+                                            {
+                                                if (srt.Attribute("name").Value == stringID)
+                                                {
+                                                    srt.SetValue($"{srt.Value}{namePrefix}");
+                                                }
+                                            }
+
+                                            stringFile.Save(strings.FullName);
+                                        }
                                     }
                                 }
+                                packageIndex++;
                             }
                         }
                     }
-
-                    xmlFile.Save(".\\Worker\\AndroidManifest.xml");
                 }
                 catch (Exception e)
                 {
