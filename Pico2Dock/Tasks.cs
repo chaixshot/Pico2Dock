@@ -35,7 +35,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o \"{dirWorker}\" -f -t xml -load-dex 10",
+                        Arguments = $"-jar {exec} d -i \"{apkFile.FullName}\" -o \"{dirWorker}\" -f -t xml -load-dex 10 -no-cache -dex",
                     }
                 };
                 decompiler.Start();
@@ -69,7 +69,7 @@ namespace Pico2Dock
                         RedirectStandardInput = true,
 
                         FileName = "java",
-                        Arguments = $"-jar {exec} b -i \"{dirWorker}\" -o \"{apkFile.FullName}\" -f -t xml",
+                        Arguments = $"-jar {exec} b -i \"{dirWorker}\" -o \"{apkFile.FullName}\" -f -t xml -no-cache",
                     }
                 };
                 compiler.Start();
@@ -192,7 +192,7 @@ namespace Pico2Dock
                 while (!signer.StandardOutput.EndOfStream)
                 {
                     string line = signer.StandardOutput.ReadLine();
-                    mainWindow.ChangeStateText($"### Signer\nSigning **{apkFile.Name}**...\n``{line}``");
+                    mainWindow.ChangeStateText($"### Signer\nSigning **{apkFile.Name}**...\n``{line.Replace("\t", "")}``");
                 }
 
                 if (signer.ExitCode != 0)

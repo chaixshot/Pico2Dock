@@ -359,7 +359,7 @@ namespace Pico2Dock
                 //?? -------------------- [[ Start decompiler apk ]] --------------------
                 progressBar.Increase();
 
-                errorMessage = await Task.Run(() => Tasks.ApkEditor.Decompiler(apkFile, isRename));
+                errorMessage = await Task.Run(() => Tasks.ApkEditor.Decompiler(apkFile));
 
                 if (isProcessCancel)
                     goto skipMainTask;
