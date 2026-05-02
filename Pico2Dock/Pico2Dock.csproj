@@ -37,9 +37,6 @@
     <None Update="src\apktool.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="src\apktool_3.0.2.jar">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="src\keystore.jks">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
