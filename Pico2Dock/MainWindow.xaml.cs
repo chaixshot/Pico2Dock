@@ -43,8 +43,8 @@ namespace Pico2Dock
         #region Parameter
         private bool isProcessCancel = false;
         private bool isProcessRunning = false;
-        private readonly ObservableCollection<string> APKFiles = [];
-        private readonly ObservableCollection<string> APKFilesOut = [];
+        public readonly ObservableCollection<string> APKFiles = [];
+        public readonly ObservableCollection<string> APKFilesOut = [];
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -173,6 +173,7 @@ namespace Pico2Dock
             if (index > -1 && !isProcessRunning)
             {
                 APKFiles.RemoveAt(index);
+                APKFilesOut.RemoveAt(index);
                 ChangeButtonState();
             }
 
@@ -184,7 +185,7 @@ namespace Pico2Dock
 
             if (index > -1 && !isProcessRunning)
             {
-                string apkPath = Regex.Replace(APKFiles[index], $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
+                string apkPath = FileIndicator.ClearTag(APKFiles[index]);
                 string apkOutPath = APKFilesOut[index];
                 FileInfo apkOutFile = new(apkOutPath);
 
@@ -202,10 +203,13 @@ namespace Pico2Dock
                             DirectoryInfo dirPico = new(apkOutPath.Replace(apkOutFile.Name, ""));
                             if (dirPico.GetFiles().Length == 0)
                                 dirPico.Delete();
+
+                            FileIndicator.ClearTag(index);
                         }
                         else
                         {
                             APKFiles.RemoveAt(index);
+                            APKFilesOut.RemoveAt(index);
                             ChangeButtonState();
                         }
                     }
@@ -225,14 +229,7 @@ namespace Pico2Dock
             if (Utils.IsJavaInstalled())
             {
                 ResetAppearance();
-
-                // Remove file indicator except error
-                foreach (string filePath in APKFiles.ToList())
-                {
-                    int index = APKFiles.IndexOf(filePath);
-
-                    APKFiles[index] = Regex.Replace(filePath, $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
-                }
+                FileIndicator.ClearAllTag();
 
                 isProcessRunning = true;
                 IsProcessNotRunning = true;
@@ -419,7 +416,6 @@ namespace Pico2Dock
                             item.Add(vrMode);
                             item.Add(layout);
 
-                            // item.SetAttributeValue(android + "taskAffinity", ".vrmode"); // Using same recent app icon row
                             item.SetAttributeValue(android + "resizeableActivity", "true");
                             if (isMainActivity)
                                 item.SetAttributeValue(android + "screenOrientation", isPortrait ? "portrait" : "landscape");
@@ -557,8 +553,6 @@ namespace Pico2Dock
                         }
                     }
 
-                    xmlFile.Save(".\\Worker\\AndroidManifest.xml");
-
                     //** Change app name
                     if (!string.IsNullOrEmpty(namePrefix))
                     {
@@ -603,6 +597,8 @@ namespace Pico2Dock
                             }
                         }
                     }
+
+                    xmlFile.Save(".\\Worker\\AndroidManifest.xml");
                 }
                 catch (Exception e)
                 {

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Pico2Dock
 {
@@ -133,5 +134,25 @@ namespace Pico2Dock
         public static readonly string Success = "✔️";
         public static readonly string Error = "✖️";
         public static readonly string ErrorInfo = "🔘";
+
+        public static void ClearAllTag()
+        {
+            // Remove file indicator except error
+            foreach (string filePath in App.mainWindow.APKFiles.ToList())
+            {
+                int index = App.mainWindow.APKFiles.IndexOf(filePath);
+                ClearTag(index);
+            }
+        }
+
+        public static void ClearTag(int index)
+        {
+            App.mainWindow.APKFiles[index] = Regex.Replace(App.mainWindow.APKFiles[index], $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
+        }
+
+        public static string ClearTag(string text)
+        {
+            return Regex.Replace(text, $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
+        }
     }
 }
