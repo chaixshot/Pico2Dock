@@ -185,7 +185,7 @@ namespace Pico2Dock
 
             if (index > -1 && !isProcessRunning)
             {
-                string apkPath = FileIndicator.ClearTag(APKFiles[index]);
+                string apkPath = Utils.FileIndicator.ClearTag(APKFiles[index]);
                 string apkOutPath = APKFilesOut[index];
                 FileInfo apkOutFile = new(apkOutPath);
 
@@ -204,7 +204,7 @@ namespace Pico2Dock
                             if (dirPico.GetFiles().Length == 0)
                                 dirPico.Delete();
 
-                            FileIndicator.ClearTag(index);
+                            Utils.FileIndicator.ClearTag(index);
                         }
                         else
                         {
@@ -229,7 +229,6 @@ namespace Pico2Dock
             if (Utils.IsJavaInstalled())
             {
                 ResetAppearance();
-                FileIndicator.ClearAllTag();
 
                 isProcessRunning = true;
                 IsProcessNotRunning = true;
@@ -286,11 +285,11 @@ namespace Pico2Dock
             foreach (string file in apkFiles.ToList())
             {
                 // skip is file error from previous task
-                if (file.Contains(FileIndicator.Error))
+                if (file.Contains(Utils.FileIndicator.Error))
                     continue;
 
                 int index = apkFiles.IndexOf(file);
-                ProgressBar progressBar = new(apkFiles.Count, 5);
+                Utils.ProgressBar progressBar = new(apkFiles.Count, 5);
 
             startFile:
 
@@ -308,7 +307,7 @@ namespace Pico2Dock
                 FileInfo dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
 
                 //?? -------------------- [[ File indicator ]] --------------------
-                apkFiles[index] = $"{FileIndicator.Working} {file}";
+                apkFiles[index] = $"{Utils.FileIndicator.Working} {file}";
                 DropBox.SelectedIndex = index;
                 DropBox.ScrollIntoView(DropBox.SelectedItem);
 
@@ -648,15 +647,15 @@ namespace Pico2Dock
                 {
                     //?? -------------------- [[ File indicator ]] --------------------
                     progressBar.Increase();
-                    apkFiles[index] = $"{FileIndicator.Success} {file}";
+                    apkFiles[index] = $"{Utils.FileIndicator.Success} {file}";
                     APKFilesOut[index] = dirApkOut.FullName;
                 }
                 else
                 {
                     if (apkFiles.Count > 1)
-                        apkFiles[index] = $"{FileIndicator.Error} {file} {FileIndicator.ErrorInfo} {errorMessage}";
+                        apkFiles[index] = $"{Utils.FileIndicator.Error} {file} {Utils.FileIndicator.ErrorInfo} {errorMessage}";
                     else
-                        apkFiles[index] = $"{FileIndicator.Error} {file}";
+                        apkFiles[index] = $"{Utils.FileIndicator.Error} {file}";
                 }
             }
 

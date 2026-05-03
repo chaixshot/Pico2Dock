@@ -114,45 +114,45 @@ namespace Pico2Dock
                 App.mainWindow.ChangeStateText($"```\n{ex}\n```");
             }
         }
-    }
 
-    internal class ProgressBar(double files, double step)
-    {
-        public double Files = files;
-        public double Step = step;
-
-        public void Increase(double mul = 1)
+        internal class ProgressBar(double files, double step)
         {
-            App.mainWindow.StatusProgressBar.Value += ((100 / Step) * mul) / Files;
-            App.mainWindow.PercentText.Text = Math.Floor(App.mainWindow.StatusProgressBar.Value).ToString() + "%";
-        }
-    }
+            public double Files = files;
+            public double Step = step;
 
-    public class FileIndicator()
-    {
-        public static readonly string Working = "🛠️";
-        public static readonly string Success = "✔️";
-        public static readonly string Error = "✖️";
-        public static readonly string ErrorInfo = "🔘";
-
-        public static void ClearAllTag()
-        {
-            // Remove file indicator except error
-            foreach (string filePath in App.mainWindow.APKFiles.ToList())
+            public void Increase(double mul = 1)
             {
-                int index = App.mainWindow.APKFiles.IndexOf(filePath);
-                ClearTag(index);
+                App.mainWindow.StatusProgressBar.Value += ((100 / Step) * mul) / Files;
+                App.mainWindow.PercentText.Text = Math.Floor(App.mainWindow.StatusProgressBar.Value).ToString() + "%";
             }
         }
 
-        public static void ClearTag(int index)
+        public class FileIndicator()
         {
-            App.mainWindow.APKFiles[index] = Regex.Replace(App.mainWindow.APKFiles[index], $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
-        }
+            public static readonly string Working = "🛠️";
+            public static readonly string Success = "✔️";
+            public static readonly string Error = "✖️";
+            public static readonly string ErrorInfo = "🔘";
 
-        public static string ClearTag(string text)
-        {
-            return Regex.Replace(text, $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
+            public static void ClearAllTag()
+            {
+                // Remove file indicator except error
+                foreach (string filePath in App.mainWindow.APKFiles.ToList())
+                {
+                    int index = App.mainWindow.APKFiles.IndexOf(filePath);
+                    ClearTag(index);
+                }
+            }
+
+            public static void ClearTag(int index)
+            {
+                App.mainWindow.APKFiles[index] = Regex.Replace(App.mainWindow.APKFiles[index], $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
+            }
+
+            public static string ClearTag(string text)
+            {
+                return Regex.Replace(text, $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
+            }
         }
     }
 }
