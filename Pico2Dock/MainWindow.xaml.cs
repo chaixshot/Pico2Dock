@@ -229,6 +229,7 @@ namespace Pico2Dock
             if (Utils.IsJavaInstalled())
             {
                 ResetAppearance();
+                Utils.FileIndicator.ClearAllTag();
 
                 isProcessRunning = true;
                 IsProcessNotRunning = true;
@@ -393,102 +394,70 @@ namespace Pico2Dock
                         layout.SetAttributeValue(android + "defaultWidth", "900.0dp");
                         layout.SetAttributeValue(android + "defaultHeight", isPortrait ? "480.0dp" : "600.0dp");
 
-                        IEnumerable<XElement> activity = xmlRoot.Descendants("application").Elements("activity");
-                        IEnumerable<XElement> activityAlias = xmlRoot.Descendants("application").Elements("activity-alias");
-
-                        foreach (XElement item in activity.Concat(activityAlias))
+                        foreach (string tagName in new string[] { "activity", "activity-alias" })
                         {
-                            bool isMainActivity = false;
-                            foreach (XElement intentFilter in item.Elements("intent-filter"))
+                            foreach (XElement item in xmlRoot.Descendants("application").Elements(tagName))
                             {
-                                foreach (XElement action in intentFilter.Elements("action"))
-                                    if (action.Attribute(android + "name").Value == "android.intent.action.MAIN")
-                                        isMainActivity = true;
+                                bool isMainActivity = item.Descendants("action").Any(a => a.Attribute(android + "name").Value == "android.intent.action.MAIN"); ;
+
+                                XElement vrMode = new("meta-data");
+                                vrMode.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
+                                vrMode.SetAttributeValue(android + "value", isMainActivity ? "6" : "2");
+
+                                item.Add(vrPosition);
+                                item.Add(vrPositionOverlay);
+                                item.Add(vrMode);
+                                item.Add(layout);
+
+                                item.SetAttributeValue(android + "resizeableActivity", "true");
+                                if (isMainActivity)
+                                    item.SetAttributeValue(android + "screenOrientation", isPortrait ? "portrait" : "landscape");
                             }
-
-                            XElement vrMode = new("meta-data");
-                            vrMode.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
-                            vrMode.SetAttributeValue(android + "value", isMainActivity ? "6" : "2");
-
-                            item.Add(vrPosition);
-                            item.Add(vrPositionOverlay);
-                            item.Add(vrMode);
-                            item.Add(layout);
-
-                            item.SetAttributeValue(android + "resizeableActivity", "true");
-                            if (isMainActivity)
-                                item.SetAttributeValue(android + "screenOrientation", isPortrait ? "portrait" : "landscape");
                         }
                     }
 
                     //** Adding element [root]
                     if (true)
                     {
-                        XElement metaData = new("meta-data");
+                        Dictionary<string, string> metaDataItems = new()
+                        {
+                            { "pvr.2dtovr.mode", "6" },
+                            { "pvr.display.orientation", "180" },
+                        };
 
-                        metaData.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
-                        metaData.SetAttributeValue(android + "value", "6");
-                        xmlRoot.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "pvr.display.orientation");
-                        metaData.SetAttributeValue(android + "value", "180");
-                        xmlRoot.Add(metaData);
+                        foreach (var item in metaDataItems)
+                        {
+                            xmlRoot.Add(new XElement("meta-data",
+                                new XAttribute(android + "name", item.Key),
+                                new XAttribute(android + "value", item.Value)
+                            ));
+                        }
                     }
 
                     //** Adding element [root > application]
                     if (true)
                     {
-                        XElement metaData = new("meta-data");
+                        Dictionary<string, string> metaDataItems = new()
+                        {
+                            { "isPUI", "1" },
+                            { "pvr.vrshell.mode", "1" },
+                            { "com.pvr.hmd.trackingmode", "6dof" },
+                            { "pico_permission_dim_show", "false" },
+                            { "pvr.2dtovr.mode", "6" },
+                            { "pvr.display.orientation", "180" },
+                            { "feature", "2" },
+                            { "feature_version", "2" },
+                            { "feature.support_custom_panel", "1" },
+                            { "channel_id", "PUI" }
+                        };
 
-                        metaData.SetAttributeValue(android + "name", "isPUI");
-                        metaData.SetAttributeValue(android + "value", "1");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "pvr.vrshell.mode");
-                        metaData.SetAttributeValue(android + "value", "1");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "com.pvr.hmd.trackingmode");
-                        metaData.SetAttributeValue(android + "value", "6dof");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "pico_permission_dim_show");
-                        metaData.SetAttributeValue(android + "value", "false");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "feature.support_custom_panel");
-                        metaData.SetAttributeValue(android + "value", "1");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "pvr.2dtovr.mode");
-                        metaData.SetAttributeValue(android + "value", "6");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "pvr.display.orientation");
-                        metaData.SetAttributeValue(android + "value", "180");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "feature");
-                        metaData.SetAttributeValue(android + "value", "2");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "feature_version");
-                        metaData.SetAttributeValue(android + "value", "2");
-                        application.Add(metaData);
-
-                        metaData = new("meta-data");
-                        metaData.SetAttributeValue(android + "name", "channel_id");
-                        metaData.SetAttributeValue(android + "value", "PUI");
-                        application.Add(metaData);
+                        foreach (var item in metaDataItems)
+                        {
+                            application.Add(new XElement("meta-data",
+                                new XAttribute(android + "name", item.Key),
+                                new XAttribute(android + "value", item.Value)
+                            ));
+                        }
                     }
 
                     //** Random package name
@@ -498,7 +467,7 @@ namespace Pico2Dock
                         string newPackageName = $"{packageName}DOCK";
 
                         // Change package name
-                        xmlRoot.Attribute("package").SetValue(newPackageName);
+                        xmlRoot.SetAttributeValue("package", newPackageName);
 
                         if (isAdvMode)
                         {
@@ -506,7 +475,7 @@ namespace Pico2Dock
                             if (sharedUserId != null)
                             {
                                 string value = sharedUserId.Value;
-                                xmlRoot.Attribute(android + "sharedUserId").SetValue(value.Replace(packageName, newPackageName));
+                                xmlRoot.SetAttributeValue(android + "sharedUserId", value.Replace(packageName, newPackageName));
                             }
                         }
 
@@ -557,42 +526,25 @@ namespace Pico2Dock
                     {
                         string app_name = application?.Attribute(android + "label")?.Value;
 
-                        if (isRename || !Regex.IsMatch(app_name, @"@string\/*"))
+                        if (isRename) // Replace name
                             application.SetAttributeValue(android + "label", namePrefix);
-                        else
+                        else if (!Regex.IsMatch(app_name, @"@string\/.+")) // Append name
+                            application.SetAttributeValue(android + "label", $"{app_name}{namePrefix}");
+                        else // Append name in resources
                         {
-                            int packageIndex = 1;
+                            // Deep resource search (Simplified directory traversal)
                             string stringID = app_name.Replace("@string/", string.Empty);
-                            bool isTwoDigit = Directory.Exists($"{Tasks.dirWorker}\\resources\\package_0{packageIndex}\\res");
+                            string[] stringFiles = Directory.GetFiles($"{Tasks.dirWorker}\\resources", "strings.xml", System.IO.SearchOption.AllDirectories);
 
-                            while (true)
+                            foreach (string stringFile in stringFiles)
                             {
-                                DirectoryInfo package = new($"{Tasks.dirWorker}\\resources\\package_{(isTwoDigit ? packageIndex.ToString("D2") : packageIndex)}\\res");
-                                if (!package.Exists)
-                                    break;
-
-                                foreach (DirectoryInfo dir in package.GetDirectories())
+                                XDocument stringXml = XDocument.Load(stringFile);
+                                XElement targetStr = stringXml.Root.Elements("string").FirstOrDefault(s => (string)s.Attribute("name") == stringID);
+                                if (targetStr != null)
                                 {
-                                    if (dir.Name.Contains("values"))
-                                    {
-                                        foreach (FileInfo strings in dir.GetFiles("strings.xml"))
-                                        {
-                                            XDocument stringFile = XDocument.Load(strings.FullName);
-                                            XElement stringRoot = stringFile.Root;
-
-                                            foreach (XElement srt in stringRoot.Elements("string"))
-                                            {
-                                                if (srt.Attribute("name").Value == stringID)
-                                                {
-                                                    srt.SetValue($"{srt.Value}{namePrefix}");
-                                                }
-                                            }
-
-                                            stringFile.Save(strings.FullName);
-                                        }
-                                    }
+                                    targetStr.Value += namePrefix;
+                                    stringXml.Save(stringFile);
                                 }
-                                packageIndex++;
                             }
                         }
                     }
