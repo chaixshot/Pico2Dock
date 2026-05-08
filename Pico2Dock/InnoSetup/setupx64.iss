@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Pico2Dock"
-#define MyAppVersion "1.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "H@mer"
 #define MyAppURL "https://github.com/chaixshot/Pico2Dock"
 #define MyAppExeName "Pico2Dock.exe"
