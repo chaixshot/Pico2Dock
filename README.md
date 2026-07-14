@@ -2,7 +2,7 @@
   <img src="Pico2Dock/src/icon.ico" width="128" height="128"/>
   
   # Pico2Dock
-  ### Convert the (X)APK(M, S) file for Pico 4 VR to change the application state from Floating Far app to Dashboard Near Dock, similar to File Manager.<br>Allow multitasking while in a full-screen immersive app.
+  ### Convert the (X)APK(M, S) file for Pico 4 and Neo 3 to change the application state from Floating Far app to Dashboard Near Dock, similar to File Manager.<br>Allow multitasking while in a full-screen immersive app.
   ### [Android Version](https://github.com/chaixshot/Pico2DockAndroid/tree/main)
   </div>
   
