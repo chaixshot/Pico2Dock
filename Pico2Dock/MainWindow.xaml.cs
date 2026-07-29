@@ -301,8 +301,8 @@ namespace Pico2Dock
 
                 string filePath = Path.GetDirectoryName(file);
                 FileInfo apkFile = new(file);
-                DirectoryInfo dirUnsign = new(".\\Unsign");
-                DirectoryInfo dirMerger = new(".\\Merger");
+                DirectoryInfo dirUnsign = new($"{Utils.TempFolder}\\Unsign");
+                DirectoryInfo dirMerger = new($"{Utils.TempFolder}\\Merger");
                 DirectoryInfo dirOut = new(filePath + "\\Pico");
                 FileInfo dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
                 FileInfo dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
@@ -373,7 +373,7 @@ namespace Pico2Dock
                 try
                 {
                     XNamespace android = "http://schemas.android.com/apk/res/android";
-                    XDocument xmlFile = XDocument.Load(".\\Worker\\AndroidManifest.xml");
+                    XDocument xmlFile = XDocument.Load($"{Utils.TempFolder}\\Worker\\AndroidManifest.xml");
                     XElement xmlRoot = xmlFile.Root;
                     XElement application = xmlRoot.Element("application");
 
@@ -549,7 +549,7 @@ namespace Pico2Dock
                         }
                     }
 
-                    xmlFile.Save(".\\Worker\\AndroidManifest.xml");
+                    xmlFile.Save($"{Utils.TempFolder}\\Worker\\AndroidManifest.xml");
                 }
                 catch (Exception e)
                 {

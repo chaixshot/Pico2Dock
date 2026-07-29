@@ -6,12 +6,14 @@ namespace Pico2Dock
 {
     internal class Utils
     {
-        public static string GetAppVersion()
+        internal static DirectoryInfo TempFolder = new(Path.Combine(Path.GetTempPath(), "Pico2Dock"));
+
+        internal static string GetAppVersion()
         {
             return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown error reading assembly version";
         }
 
-        public static void OpenExplorer(string filePath)
+        internal static void OpenExplorer(string filePath)
         {
             string args;
             if (System.IO.Path.GetExtension(filePath) != string.Empty)
@@ -26,7 +28,7 @@ namespace Pico2Dock
             Process.Start(info);
         }
 
-        public static bool IsJavaInstalled()
+        internal static bool IsJavaInstalled()
         {
             Process java = new()
             {
@@ -53,15 +55,15 @@ namespace Pico2Dock
             }
         }
 
-        public static void DirectoryCleanup()
+        internal static void DirectoryCleanup()
         {
             try
             {
-                DirectoryInfo Unsign = new(".\\Unsign");
+                DirectoryInfo Unsign = new($"{TempFolder}\\Unsign");
 
                 if (Unsign.Exists)
                 {
-                    foreach (FileInfo file in new DirectoryInfo(".\\Unsign").GetFiles())
+                    foreach (FileInfo file in new DirectoryInfo($"{TempFolder}\\Unsign").GetFiles())
                     {
                         file.Delete();
                     }
@@ -74,7 +76,7 @@ namespace Pico2Dock
 
             try
             {
-                DirectoryInfo worker = new(".\\Worker");
+                DirectoryInfo worker = new($"{TempFolder}\\Worker");
 
                 if (worker.Exists)
                 {
@@ -82,7 +84,7 @@ namespace Pico2Dock
                     {
                         file.Delete();
                     }
-                    foreach (string dir in Directory.GetDirectories(".\\Worker"))
+                    foreach (string dir in Directory.GetDirectories($"{TempFolder}\\Worker"))
                     {
                         Directory.Delete(dir, true);
                     }
@@ -95,7 +97,7 @@ namespace Pico2Dock
 
             try
             {
-                DirectoryInfo merger = new(".\\Merger");
+                DirectoryInfo merger = new($"{TempFolder}\\Merger");
 
                 if (merger.Exists)
                 {
@@ -103,7 +105,7 @@ namespace Pico2Dock
                     {
                         file.Delete();
                     }
-                    foreach (string dir in Directory.GetDirectories(".\\Merger"))
+                    foreach (string dir in Directory.GetDirectories($"{TempFolder}\\Merger"))
                     {
                         Directory.Delete(dir, true);
                     }
@@ -117,24 +119,24 @@ namespace Pico2Dock
 
         internal class ProgressBar(double files, double step)
         {
-            public double Files = files;
-            public double Step = step;
+            internal double Files = files;
+            internal double Step = step;
 
-            public void Increase(double mul = 1)
+            internal void Increase(double mul = 1)
             {
                 App.mainWindow.StatusProgressBar.Value += ((100 / Step) * mul) / Files;
                 App.mainWindow.PercentText.Text = Math.Floor(App.mainWindow.StatusProgressBar.Value).ToString() + "%";
             }
         }
 
-        public class FileIndicator()
+        internal class FileIndicator()
         {
-            public static readonly string Working = "🛠️";
-            public static readonly string Success = "✔️";
-            public static readonly string Error = "✖️";
-            public static readonly string ErrorInfo = "🔘";
+            internal static readonly string Working = "🛠️";
+            internal static readonly string Success = "✔️";
+            internal static readonly string Error = "✖️";
+            internal static readonly string ErrorInfo = "🔘";
 
-            public static void ClearAllTag()
+            internal static void ClearAllTag()
             {
                 // Remove file indicator except error
                 foreach (string filePath in App.mainWindow.APKFiles.ToList())
@@ -144,12 +146,12 @@ namespace Pico2Dock
                 }
             }
 
-            public static void ClearTag(int index)
+            internal static void ClearTag(int index)
             {
                 App.mainWindow.APKFiles[index] = Regex.Replace(App.mainWindow.APKFiles[index], $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
             }
 
-            public static string ClearTag(string text)
+            internal static string ClearTag(string text)
             {
                 return Regex.Replace(text, $@"({FileIndicator.Working}|{FileIndicator.Success})\s", string.Empty);
             }
