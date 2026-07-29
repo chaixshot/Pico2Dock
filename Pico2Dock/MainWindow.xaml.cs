@@ -327,10 +327,6 @@ namespace Pico2Dock
 
                     errorMessage = await Task.Run(() => Tasks.ApkEditor.Merger(apkFile));
 
-                    apkFile = new($"{dirMerger}\\{Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", ".apk")}");
-                    dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
-                    dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
-
                     if (isProcessCancel)
                         goto skipMainTask;
                     else if (!string.IsNullOrEmpty(errorMessage))
@@ -339,6 +335,10 @@ namespace Pico2Dock
 
                         goto skipFile;
                     }
+
+                    apkFile = new($"{dirMerger}\\{Regex.Replace(apkFile.Name, $@"{apkFile.Extension}$", ".apk")}");
+                    dirApkOut = new($"{dirOut}\\Pico_{apkFile.Name}");
+                    dirApkUnsing = new($"{dirUnsign}\\Pico_{apkFile.Name}");
                 }
 
                 //?? -------------------- [[ Rename ]] --------------------
@@ -578,13 +578,6 @@ namespace Pico2Dock
 
                 errorMessage = await Task.Run(() => Tasks.UberApkSigner.Signer(dirApkUnsing, dirApkOut));
 
-                FileInfo dirApkSigned = new($"{Regex.Replace(dirApkOut.FullName, $@"{dirApkOut.Extension}$", "")}-aligned-signed.apk");
-                FileInfo idsig = new(dirApkSigned + ".idsig");
-
-                dirApkSigned.MoveTo(dirApkOut.FullName);
-                if (idsig.Exists)
-                    idsig.Delete();
-
                 if (isProcessCancel)
                     goto skipMainTask;
                 else if (!string.IsNullOrEmpty(errorMessage))
@@ -592,6 +585,13 @@ namespace Pico2Dock
                     progressBar.Increase(1);
                     goto skipFile;
                 }
+
+                FileInfo dirApkSigned = new($"{Regex.Replace(dirApkOut.FullName, $@"{dirApkOut.Extension}$", "")}-aligned-signed.apk");
+                FileInfo idsig = new(dirApkSigned + ".idsig");
+
+                dirApkSigned.MoveTo(dirApkOut.FullName);
+                if (idsig.Exists)
+                    idsig.Delete();
 
             skipFile:
 
