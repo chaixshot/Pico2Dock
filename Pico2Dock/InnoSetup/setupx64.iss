@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Pico2Dock"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "H@mer"
 #define MyAppURL "https://github.com/chaixshot/Pico2Dock"
 #define MyAppExeName "Pico2Dock.exe"
@@ -23,9 +23,9 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputDir=E:\github\Pico2Dock\Pico2Dock\InnoSetup
+OutputDir=..\InnoSetup
 OutputBaseFilename=Pico2Dock_x64-Installer
-SetupIconFile=E:\github\Pico2Dock\Pico2Dock\src\icon.ico
+SetupIconFile=..\src\icon.ico
 SolidCompression=yes
 WizardStyle=modern
 
@@ -36,7 +36,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "E:\github\Pico2Dock\Pico2Dock\bin\Release\net10.0-windows7.0\win-x64\publish\*"; DestDir: "{app}"; Excludes: "x86"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\bin\Release\net10.0-windows10.0.22621.0\win-x64\publish\*"; DestDir: "{app}"; Excludes: "x86"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
