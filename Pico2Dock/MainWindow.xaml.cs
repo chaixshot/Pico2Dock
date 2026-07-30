@@ -617,24 +617,24 @@ namespace Pico2Dock
             ChangeStateText($"### Current Status\nCleaning directory...");
             await Task.Run(Utils.DirectoryCleanup);
 
-            if (isProcessCancel)
-            { // Terminate
+            if (isProcessCancel) //^^ Terminate
+            {
                 PercentText.Text = "Terminated";
 
                 ChangeStateText("### Current Status\nProcess has been terminated.");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
                 SystemSounds.Asterisk.Play();
             }
-            else if (!string.IsNullOrEmpty(errorMessage))
-            { // Error
+            else if (!string.IsNullOrEmpty(errorMessage)) //!! Error
+            {
                 PercentText.Text = "Error";
 
                 ChangeStateText($"### ERROR\n{errorMessage}");
                 StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
                 SystemSounds.Hand.Play();
             }
-            else
-            { // Success
+            else //** Success
+            {
                 PercentText.Text = "Successful";
 
                 ChangeStateText($"### Current Status\nAll files have been modified.\n* The APK files are in the Pico folder by the same directory as the original file.\n* Right click file in the box above to see the options.");

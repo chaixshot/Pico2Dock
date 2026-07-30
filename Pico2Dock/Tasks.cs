@@ -170,7 +170,7 @@ namespace Pico2Dock
 
             public static string Signer(FileInfo apkFile, FileInfo outputDir)
             {
-                mainWindow.ChangeStateText($"### Signer\nSigning **{apkFile.Name}**`");
+                mainWindow.ChangeStateText($"### Signer\nSigning **{apkFile.Name}**");
 
                 signer = new()
                 {
