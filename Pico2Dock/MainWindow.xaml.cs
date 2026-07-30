@@ -166,6 +166,55 @@ namespace Pico2Dock
                 Utils.OpenExplorer(APKFilesOut[index]);
         }
 
+        private async void Contextmenu_Install(object sender, RoutedEventArgs e)
+        {
+            int index = DropBox.SelectedIndex;
+
+            if (index > -1 && !isProcessRunning)
+            {
+                FileInfo apkFile = new(APKFilesOut[index]);
+                string errorMessage;
+
+                ResetAppearance();
+                isProcessRunning = true;
+                StatusProgressBar.Value = 50;
+                PercentText.Text = Math.Floor(StatusProgressBar.Value).ToString();
+                ChangeButtonState();
+
+                errorMessage = await Task.Run(() => Tasks.ADB.Install(apkFile));
+
+                if (isProcessCancel) //^^ Terminate
+                {
+                    PercentText.Text = "Terminated";
+
+                    ChangeStateText("### Current Status\nInstallation has been terminated.");
+                    StatusProgressBar.Foreground = new SolidColorBrush(Colors.DarkOrange);
+                    SystemSounds.Asterisk.Play();
+                }
+                else if (!string.IsNullOrEmpty(errorMessage)) //!! Error
+                {
+                    ChangeStateText($"### ERROR\n{errorMessage}");
+                    StatusProgressBar.Foreground = new SolidColorBrush(Colors.Red);
+                    SystemSounds.Hand.Play();
+                }
+                else //** Succes
+                {
+                    PercentText.Text = "Successful";
+
+                    ChangeStateText($"### Current Status\n**{apkFile}** installed successful.");
+                    StatusProgressBar.Foreground = new SolidColorBrush(Colors.Green);
+                    SystemSounds.Asterisk.Play();
+                }
+
+                StatusProgressBar.Value = 100;
+                isProcessCancel = false;
+                isProcessRunning = false;
+                IsProcessNotRunning = false;
+
+                ChangeButtonState();
+            }
+        }
+
         private void Contextmenu_Remove(object sender, RoutedEventArgs e)
         {
             int index = DropBox.SelectedIndex;
@@ -176,7 +225,6 @@ namespace Pico2Dock
                 APKFilesOut.RemoveAt(index);
                 ChangeButtonState();
             }
-
         }
 
         private async void Contextmenu_Delete(object sender, RoutedEventArgs e)

@@ -13,6 +13,7 @@ namespace Pico2Dock
         private static Process? compiler;
         private static Process? merger;
         private static Process? signer;
+        private static Process? adbInstaller;
 
         internal class ApkEditor
         {
@@ -202,6 +203,93 @@ namespace Pico2Dock
             }
         }
 
+        internal class ADB
+        {
+            internal static string Install(FileInfo apkFile)
+            {
+            startover:
+
+                mainWindow.ChangeStateText($"### ADB\nInstalling **{apkFile.Name}**");
+
+                adbInstaller = new()
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+
+                        FileName = "./src/adb/adb.exe",
+                        Arguments = $"install -r -d -g \"{apkFile}\"",
+                    }
+                };
+                adbInstaller.Start();
+
+                while (!adbInstaller.StandardOutput.EndOfStream)
+                {
+                    string line = adbInstaller.StandardOutput.ReadLine();
+                    mainWindow.ChangeStateText($"### ADB\nInstalling **{apkFile.Name}**...\n``{line.Replace("\t", "")}``");
+                }
+
+                if (adbInstaller.ExitCode != 0)
+                {
+                    string errorMessage = adbInstaller.StandardError.ReadToEnd();
+
+                    if (errorMessage.Contains("signatures do not match")) // Try uninstall previous installed app if signatures mismatch
+                    {
+                        Match match = Regex.Match(errorMessage, @"Package ([\w\.]+) signatures do not match");
+                        if (match.Success)
+                        {
+                            string packageName = match.Groups[1].Value;
+
+                            Uninstall(packageName);
+                            goto startover;
+                        }
+                    }
+
+                    return $"**Exit Code:** {adbInstaller.ExitCode}\n```\n {errorMessage} \n```";
+                }
+                else
+                    return string.Empty;
+            }
+
+            internal static string Uninstall(string packageName)
+            {
+                mainWindow.ChangeStateText($"### ADB\nUninstalling **{packageName}**");
+
+                adbInstaller = new()
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        RedirectStandardInput = true,
+
+                        FileName = "./src/adb/adb.exe",
+                        Arguments = $"uninstall \"{packageName}\"",
+                    }
+                };
+                adbInstaller.Start();
+
+                while (!adbInstaller.StandardOutput.EndOfStream)
+                {
+                    string line = adbInstaller.StandardOutput.ReadLine();
+                    mainWindow.ChangeStateText($"### ADB\nUninstalling **{packageName}**...\n``{line.Replace("\t", "")}``");
+                }
+
+                if (adbInstaller.ExitCode != 0)
+                    return $"**Exit Code:** {adbInstaller.ExitCode}\n```\n {adbInstaller.StandardError.ReadToEnd()} \n```";
+                else
+                    return string.Empty;
+            }
+        }
+
         //??
         public static void KillTasks()
         {
@@ -211,6 +299,7 @@ namespace Pico2Dock
                 compiler?.Kill(true);
                 merger?.Kill(true);
                 signer?.Kill(true);
+                adbInstaller?.Kill(true);
             }
             catch (Exception ex)
             {
